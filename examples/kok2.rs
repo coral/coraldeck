@@ -13,7 +13,7 @@ fn main() {
 
     loop {
         // calling `poll()` will keep this browser alive
-        event_loop.poll(Duration::from_secs(0)).unwrap();
+        event_loop.poll(Duration::from_secs(1)).unwrap();
     }
 }
 

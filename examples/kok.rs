@@ -2,6 +2,7 @@ use coraldeck::motu;
 use coraldeck::KeyLight;
 use std::net::Ipv4Addr;
 use std::str::FromStr;
+use std::time::Duration;
 #[tokio::main]
 async fn main() {
     // let ip = Ipv4Addr::from_str("10.0.1.5").unwrap();
@@ -17,11 +18,12 @@ async fn main() {
     //     .as_f64()
     //     .unwrap();
     // dbg!(myval);
+    let mut kl = KeyLight::new_from_name("Key Light Left").await;
 
-    KeyLight::new_from_name().await;
-    let ip = Ipv4Addr::from_str("10.0.1.32").unwrap();
-    let mut kl = KeyLight::new_from_ip(ip);
+    dbg!(kl);
 
-    let klval = kl.get().await.unwrap();
-    dbg!(klval);
+    // let klval = kl.get().await.unwrap();
+    // dbg!(klval);
+
+    tokio::time::sleep(Duration::from_secs(5)).await;
 }
