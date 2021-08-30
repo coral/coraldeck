@@ -8,7 +8,6 @@ use std::ops::DerefMut;
 use std::sync::Arc;
 use std::time::Duration;
 use thiserror::Error;
-use tokio::sync::oneshot;
 use tokio::sync::Mutex;
 use tokio::time;
 
@@ -49,11 +48,9 @@ impl MOTU {
     }
 
     pub async fn connect(&mut self) -> Result<(), MOTUError> {
-        let data =
-            MOTU::get_cache(self.client.clone(), self.url.clone(), self.cache.clone()).await?;
+        let data = MOTU::get_cache(self.client.clone(), self.url.clone()).await?;
 
-        let cacheref = self.cache.clone();
-        *cacheref.lock().await.deref_mut() = data;
+        *self.cache.clone().lock().await.deref_mut() = data;
 
         let cacheref = self.cache.clone();
         let url = self.url.clone();
@@ -63,7 +60,7 @@ impl MOTU {
             loop {
                 interval.tick().await;
 
-                match MOTU::get_cache(client.clone(), url.clone(), cacheref.clone()).await {
+                match MOTU::get_cache(client.clone(), url.clone()).await {
                     Ok(data) => {
                         *cacheref.lock().await.deref_mut() = data;
                     }
@@ -79,7 +76,6 @@ impl MOTU {
     async fn get_cache(
         client: reqwest::Client,
         url: String,
-        cacheref: Arc<Mutex<HashMap<String, Value>>>,
     ) -> Result<HashMap<String, Value>, MOTUError> {
         let resp = client.get(&url).send().await?;
 
