@@ -63,8 +63,9 @@ impl KeyLight {
 
     pub async fn new_from_name(name: &str) -> Result<KeyLight, ElgatoError> {
         let (tx, mut rx) = mpsc::channel(200);
-
         let (ctx, crx) = std::sync::mpsc::channel();
+
+        let name = name.to_string();
 
         tokio::task::spawn_blocking(move || {
             let mut browser = MdnsBrowser::new(ServiceType::new("elg", "tcp").unwrap());
@@ -73,7 +74,9 @@ impl KeyLight {
                 move |result: zeroconf::Result<ServiceDiscovery>,
                       _context: Option<Arc<dyn Any>>| {
                     let res = result.unwrap();
-                    tx.blocking_send(res);
+                    if res.name() == &name {
+                        tx.blocking_send(res);
+                    }
                 },
             ));
 
