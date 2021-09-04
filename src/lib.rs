@@ -1,4 +1,5 @@
-pub mod elgato;
+mod config;
 pub mod motu;
-
-pub use elgato::KeyLight;
+pub mod render;
+pub use config::Config;
+pub mod sman;

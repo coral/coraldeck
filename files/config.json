@@ -1,0 +1,7 @@
+{
+	"devices": {
+		"keylight": ["Key Light Left", "Key Light Right"],
+		"motu": "10.0.1.5",
+		"camera": "A:4BE2529F"
+	}
+}
