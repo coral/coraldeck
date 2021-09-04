@@ -1,6 +1,6 @@
 mod config;
 mod controller;
-mod render;
+mod graphics;
 mod sman;
 
 use config::Config;
@@ -16,7 +16,7 @@ async fn main() {
 
     let sman = StreamDeckManager::new().await.unwrap();
 
-    let mut ctrl = Controller::new(cfg).await;
+    let mut ctrl = Controller::new(cfg, sman).await;
 
     let mut handles = vec![];
 

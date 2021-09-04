@@ -15,7 +15,7 @@ lazy_static! {
         .unwrap();
 }
 
-struct Render {
+pub struct Drawer {
     dt: DrawTarget,
 
     bg: SolidSource,
@@ -27,7 +27,7 @@ struct Render {
     category_text: SolidSource,
 }
 
-impl Default for Render {
+impl Default for Drawer {
     fn default() -> Self {
         Self {
             dt: DrawTarget::new(72, 72),
@@ -77,9 +77,15 @@ impl Default for Render {
     }
 }
 
-impl Render {
-    pub fn new() -> Render {
-        Render::default()
+impl Drawer {
+    pub fn new() -> Drawer {
+        Drawer::default()
+    }
+
+    pub fn draw(&mut self, header: &str, action: &str, value: &str) -> DynamicImage {
+        self.header(header);
+        self.content(action, value);
+        self.output()
     }
 
     pub fn output(&mut self) -> DynamicImage {

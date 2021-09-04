@@ -34,6 +34,7 @@ pub struct Actions {
     pub btn: u8,
     pub module: String,
     pub action: String,
+    pub desc: String,
     pub value: Option<bool>,
 }
 

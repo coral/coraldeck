@@ -9,23 +9,27 @@
 			"btn": 2,
 			"module": "motu",
 			"action": "vol_up",
+			"desc": "VOL +",
 			"value": true
 		},
 		{
 			"btn": 7,
 			"module": "motu",
-			"action": "vol_down"
+			"action": "vol_down",
+			"desc": "VOL -"
 		},
 		{
 			"btn": 3,
 			"module": "camera",
 			"action": "iso_up",
+			"desc": "ISO +",
 			"value": true
 		},
 		{
 			"btn": 8,
 			"module": "camera",
-			"action": "iso_down"
+			"action": "iso_down",
+			"desc": "ISO -"
 		}
 	]
 }

@@ -1,3 +1,4 @@
+use image::DynamicImage;
 use std::sync::Arc;
 use std::time::Instant;
 use streamdeck::StreamDeck;
@@ -64,6 +65,14 @@ impl StreamDeckManager {
 
     pub async fn subscribe(&mut self) -> Receiver<ButtonPress> {
         self.channel.lock().await.subscribe()
+    }
+
+    pub async fn set_button_image(
+        &mut self,
+        button: u8,
+        image: DynamicImage,
+    ) -> Result<(), streamdeck::Error> {
+        self.device.lock().await.set_button_image(button, image)
     }
 
     async fn poll(device: Arc<Mutex<StreamDeck>>, chan: Arc<Mutex<Sender<ButtonPress>>>) {
