@@ -17,6 +17,7 @@ pub enum ConfigError {
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     pub devices: Devices,
+    pub actions: Vec<Actions>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -25,6 +26,15 @@ pub struct Devices {
     pub keylight: Vec<String>,
     pub motu: Ipv4Addr,
     pub camera: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Actions {
+    pub btn: u8,
+    pub module: String,
+    pub action: String,
+    pub value: Option<bool>,
 }
 
 impl Config {

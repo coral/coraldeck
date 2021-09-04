@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use std::time::Instant;
 use streamdeck::StreamDeck;
-use thiserror::Error;
 use tokio::sync::{broadcast, broadcast::Receiver, broadcast::Sender, Mutex};
 use tokio::time::{self, Duration};
 

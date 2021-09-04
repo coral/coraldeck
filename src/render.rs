@@ -8,7 +8,7 @@ pub fn render() -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let mut dt = DrawTarget::new(72, 72);
 
     let font = SystemSource::new()
-        .select_best_match(&[FamilyName::SansSerif], &Properties::new())
+        .select_by_postscript_name("Helvetica")
         .unwrap()
         .load()
         .unwrap();
@@ -89,7 +89,7 @@ pub fn render() -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     //Action Text
     dt.draw_text(
         &font,
-        25.,
+        20.,
         "ISO +",
         Point::new(5., 42.),
         &Source::Solid(SolidSource {
@@ -104,7 +104,7 @@ pub fn render() -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     //Value Text
     dt.draw_text(
         &font,
-        25.,
+        20.,
         "1600",
         Point::new(5., 65.),
         &Source::Solid(SolidSource {

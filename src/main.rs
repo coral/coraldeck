@@ -1,13 +1,14 @@
-use streamdeck::{Colour, StreamDeck};
+mod config;
 mod render;
-use image::DynamicImage;
+mod sman;
 
-fn main() {
-    let mut m = StreamDeck::connect(0x0fd9, 0x0060, None).unwrap();
-    m.set_brightness(20).unwrap();
-    let img = render::render();
-    let d = DynamicImage::ImageRgb8(img);
-    m.set_button_image(2, d);
-    //m.set_button_rgb(0, &Colour { r: 255, g: 0, b: 0 }).unwrap();
-    dbg!(m.image_size());
+use config::Config;
+use sman::StreamDeckManager;
+
+#[tokio::main]
+async fn main() {
+    let cfg = Config::load_config("files/config.json").unwrap();
+    dbg!(cfg);
+
+    let sman = StreamDeckManager::new().await.unwrap();
 }

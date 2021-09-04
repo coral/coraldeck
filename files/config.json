@@ -3,5 +3,29 @@
 		"keylight": ["Key Light Left", "Key Light Right"],
 		"motu": "10.0.1.5",
 		"camera": "A:4BE2529F"
-	}
+	},
+	"actions": [
+		{
+			"btn": 2,
+			"module": "motu",
+			"action": "vol_up",
+			"value": true
+		},
+		{
+			"btn": 7,
+			"module": "motu",
+			"action": "vol_down"
+		},
+		{
+			"btn": 3,
+			"module": "camera",
+			"action": "iso_up",
+			"value": true
+		},
+		{
+			"btn": 8,
+			"module": "camera",
+			"action": "iso_down"
+		}
+	]
 }
