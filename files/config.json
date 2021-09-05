@@ -6,30 +6,56 @@
 	},
 	"actions": [
 		{
-			"btn": 2,
+			"btn": 1,
 			"module": "motu",
 			"action": "vol_up",
 			"desc": "VOL +",
 			"value": true
 		},
 		{
-			"btn": 7,
+			"btn": 6,
 			"module": "motu",
 			"action": "vol_down",
 			"desc": "VOL -"
 		},
 		{
-			"btn": 3,
+			"btn": 2,
 			"module": "camera",
 			"action": "iso_up",
 			"desc": "ISO +",
 			"value": true
 		},
 		{
-			"btn": 8,
+			"btn": 7,
 			"module": "camera",
 			"action": "iso_down",
 			"desc": "ISO -"
+		},
+		{
+			"btn": 3,
+			"module": "keylight",
+			"action": "left_light_up",
+			"desc": "L LI +",
+			"value": true
+		},
+		{
+			"btn": 8,
+			"module": "keylight",
+			"action": "left_light_down",
+			"desc": "L LI -"
+		},
+		{
+			"btn": 4,
+			"module": "keylight",
+			"action": "right_light_up",
+			"desc": "R LI +",
+			"value": true
+		},
+		{
+			"btn": 9,
+			"module": "keylight",
+			"action": "right_light_down",
+			"desc": "R LI -"
 		}
 	]
 }

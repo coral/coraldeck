@@ -1,5 +1,7 @@
+pub mod keylight;
 pub mod motu;
 
+pub use keylight::{KeyLight, KeyLights};
 pub use motu::MOTU;
 
 use async_trait::async_trait;

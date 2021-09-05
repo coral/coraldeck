@@ -6,7 +6,7 @@ mod sman;
 
 use config::Config;
 use controller::Controller;
-use modules::{Module, MOTU};
+use modules::{KeyLight, KeyLights, Module, MOTU};
 use sman::StreamDeckManager;
 
 #[macro_use]
@@ -24,6 +24,15 @@ async fn main() {
         let mut motu = MOTU::new(cfg.devices.motu);
         motu.connect().await.unwrap();
         m.push(Box::new(motu));
+
+        //Keylights
+        let mut lights: Vec<KeyLight> = Vec::new();
+        for l in &cfg.devices.keylight {
+            let mut key = KeyLight::new_from_name(&l, true).await.unwrap();
+            lights.push(key);
+        }
+        let kl = KeyLights::new(lights).await;
+        m.push(Box::new(kl));
     }
     // Controller
 
