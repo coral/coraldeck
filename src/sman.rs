@@ -76,17 +76,13 @@ impl StreamDeckManager {
     }
 
     async fn poll(device: Arc<Mutex<StreamDeck>>, chan: Arc<Mutex<Sender<ButtonPress>>>) {
-        let mut interval = time::interval(Duration::from_millis(5));
+        let mut interval = time::interval(Duration::from_millis(1));
 
         let mut state: Vec<ButtonState> = vec![ButtonState::default(); 5 * 3];
 
         loop {
             interval.tick().await;
-            match device
-                .lock()
-                .await
-                .read_buttons(Some(Duration::from_millis(5)))
-            {
+            match device.lock().await.read_buttons(None) {
                 Ok(data) => {
                     for it in data.iter().enumerate().zip(state.iter_mut()) {
                         let ((num, new_state), stored_state) = it;

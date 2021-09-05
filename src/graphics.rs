@@ -2,7 +2,7 @@ use font_kit::family_name::FamilyName;
 use font_kit::font::Font;
 use font_kit::properties::{Properties, Weight};
 use font_kit::source::SystemSource;
-use image::{DynamicImage, ImageBuffer, Rgb, RgbImage};
+use image::{DynamicImage, Rgb, RgbImage};
 use raqote::*;
 
 use lazy_static::lazy_static;
