@@ -541,9 +541,9 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "elgato-keylight"
-version = "0.4.2"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71a2c8aad11a0d515f20bc2ef65c9efe64bacf84131891b722f2cfbd5ec3673a"
+checksum = "3db2264c163696460f936a40323237b9a692fc7bf0727c15dc9e2969cae1acb4"
 dependencies = [
  "reqwest",
  "serde",

@@ -16,7 +16,7 @@ thiserror = "1.0.28"
 pretty_env_logger = "0.4.0"
 log = "0.4.14"
 zeroconf = "0.10.2"
-elgato-keylight = "0.4.2"
+elgato-keylight = "0.4.4"
 raqote = { git = "https://github.com/jrmuizel/raqote.git" }
 font-kit = "0.10.1"
 image = "0.23.14"

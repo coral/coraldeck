@@ -21,34 +21,10 @@ impl Module for KeyLights {
 
     async fn trigger(&mut self, action: &str) -> Option<String> {
         match action {
-            "left_light_up" => Some(
-                self.lights[0]
-                    .set_relative_brightness(0.05)
-                    .await
-                    .unwrap()
-                    .to_string(),
-            ),
-            "left_light_down" => Some(
-                self.lights[0]
-                    .set_relative_brightness(-0.05)
-                    .await
-                    .unwrap()
-                    .to_string(),
-            ),
-            "right_light_up" => Some(
-                self.lights[1]
-                    .set_relative_brightness(0.05)
-                    .await
-                    .unwrap()
-                    .to_string(),
-            ),
-            "right_light_down" => Some(
-                self.lights[1]
-                    .set_relative_brightness(-0.05)
-                    .await
-                    .unwrap()
-                    .to_string(),
-            ),
+            "left_light_up" => self.lights[0].trigger("light_up").await,
+            "left_light_down" => self.lights[0].trigger("light_down").await,
+            "right_light_up" => self.lights[1].trigger("light_up").await,
+            "right_light_down" => self.lights[1].trigger("light_down").await,
             _ => None,
         }
     }
@@ -62,14 +38,18 @@ impl Module for KeyLight {
 
     async fn trigger(&mut self, action: &str) -> Option<String> {
         match action {
-            "light_up" => {
-                self.set_relative_brightness(0.05);
-                return Some(S("0"));
-            }
-            "light_down" => {
-                self.set_relative_brightness(-0.05);
-                return Some(S("0"));
-            }
+            "light_up" => Some(
+                self.set_relative_brightness(0.05)
+                    .await
+                    .unwrap()
+                    .to_string(),
+            ),
+            "light_down" => Some(
+                self.set_relative_brightness(-0.05)
+                    .await
+                    .unwrap()
+                    .to_string(),
+            ),
             _ => None,
         }
     }
