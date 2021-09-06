@@ -56,6 +56,12 @@
 			"module": "keylight",
 			"action": "right_light_down",
 			"desc": "R LI -"
+		},
+		{
+			"btn": 14,
+			"module": "keylight",
+			"action": "toggle_power",
+			"desc": "TOGGLE"
 		}
 	]
 }

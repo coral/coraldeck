@@ -11,6 +11,15 @@ impl KeyLights {
     pub async fn new(lights: Vec<KeyLight>) -> KeyLights {
         KeyLights { lights }
     }
+
+    async fn toggle(&mut self) -> String {
+        let ns = self.lights[0].get().await.unwrap().lights[0].on == 0;
+        if ns {
+            S("power_on")
+        } else {
+            S("power_off")
+        }
+    }
 }
 
 #[async_trait]
@@ -25,6 +34,15 @@ impl Module for KeyLights {
             "left_light_down" => self.lights[0].trigger("light_down").await,
             "right_light_up" => self.lights[1].trigger("light_up").await,
             "right_light_down" => self.lights[1].trigger("light_down").await,
+            "toggle_power" => {
+                let p = self.toggle().await;
+                let mut res: Option<String> = None;
+                for l in self.lights.iter_mut() {
+                    res = l.trigger(&p).await
+                }
+
+                res
+            }
             _ => None,
         }
     }
@@ -50,6 +68,15 @@ impl Module for KeyLight {
                     .unwrap()
                     .to_string(),
             ),
+            "power_on" => match self.set_power(true).await {
+                Ok(_) => Some(S("ON")),
+                Err(_) => None,
+            },
+            "power_off" => match self.set_power(false).await {
+                Ok(_) => Some(S("OFF")),
+                Err(_) => None,
+            },
+
             _ => None,
         }
     }
