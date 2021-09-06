@@ -6,8 +6,9 @@ mod sman;
 
 use config::Config;
 use controller::Controller;
-use modules::{KeyLight, KeyLights, Module, MOTU};
+use modules::{Camera, KeyLight, KeyLights, Module, MOTU};
 use sman::StreamDeckManager;
+use std::time::Duration;
 
 #[macro_use]
 extern crate lazy_static;
@@ -33,6 +34,11 @@ async fn main() {
         }
         let kl = KeyLights::new(lights).await;
         m.push(Box::new(kl));
+
+        //Camera
+        let mut cam = Camera::new(&cfg.devices.camera).await.unwrap();
+        cam.connect(Duration::from_secs(10)).await.unwrap();
+        m.push(Box::new(cam));
     }
     // Controller
 

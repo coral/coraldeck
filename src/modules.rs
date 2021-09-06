@@ -1,6 +1,8 @@
+pub mod camera;
 pub mod keylight;
 pub mod motu;
 
+pub use camera::BluetoothCamera as Camera;
 pub use keylight::{KeyLight, KeyLights};
 pub use motu::MOTU;
 
