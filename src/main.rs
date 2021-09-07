@@ -13,8 +13,14 @@ use std::time::Duration;
 #[macro_use]
 extern crate lazy_static;
 
+extern crate pretty_env_logger;
+#[macro_use]
+extern crate log;
+
 #[tokio::main]
 async fn main() {
+    pretty_env_logger::init();
+    info!("Starting CORALDECK");
     let cfg = Config::load_config("files/config.json").unwrap();
 
     let mut sman = StreamDeckManager::new().await.unwrap();
@@ -46,14 +52,14 @@ async fn main() {
         });
         sgfx.load(&mut sman, "KEYLIGHT").await;
 
-        // //Camera
-        // let mut cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
-        // cam.connect(Duration::from_secs(10)).await.unwrap();
-        // m.push(ModuleConfig {
-        //     module: Box::new(cam),
-        //     color: cfg.devices.camera.color,
-        // });
-        // sgfx.load(&mut sman, "CAMERA").await;
+        //Camera
+        let mut cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
+        cam.connect(Duration::from_secs(10)).await.unwrap();
+        m.push(ModuleConfig {
+            module: Box::new(cam),
+            color: cfg.devices.camera.color,
+        });
+        sgfx.load(&mut sman, "CAMERA").await;
     }
     // Controller
 

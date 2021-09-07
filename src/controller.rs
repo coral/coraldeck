@@ -3,8 +3,10 @@ use crate::graphics::{Color, Drawer};
 use crate::modules::Module;
 use crate::StreamDeckManager;
 use image::{ImageBuffer, Rgb};
+use log::trace;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::sync::mpsc::{self, Receiver, Sender};
 use tokio::sync::Mutex;
 
 pub struct Controller {
@@ -15,6 +17,7 @@ pub struct Controller {
     modules: HashMap<String, Box<dyn Module + Send>>,
 
     buttons: Arc<Mutex<Vec<Button>>>,
+    rendtrig: Sender<bool>,
 }
 
 pub struct Button {
@@ -36,6 +39,8 @@ impl Controller {
         sman: StreamDeckManager,
         modules: Vec<ModuleConfig>,
     ) -> Controller {
+        let (rend_tx, rend_rx) = mpsc::channel(32);
+
         let mut ctrl = Controller {
             cfg,
             sman,
@@ -43,6 +48,7 @@ impl Controller {
             modules: HashMap::new(),
 
             buttons: Arc::new(Mutex::new(Vec::new())),
+            rendtrig: rend_tx,
         };
 
         ctrl.setup(modules).await;
@@ -51,14 +57,14 @@ impl Controller {
         let render_list = ctrl.buttons.clone();
 
         tokio::spawn(async move {
-            Controller::render(render_deck, render_list).await;
+            Controller::render(render_deck, render_list, rend_rx).await;
         });
 
         ctrl
     }
 
     async fn setup(&mut self, mut modules: Vec<ModuleConfig>) {
-        self.sman.reset().await;
+        let _ = self.sman.reset().await;
 
         //Setup routing
         for action in &self.cfg.actions {
@@ -67,15 +73,19 @@ impl Controller {
 
         let mut sb = self.buttons.lock().await;
         for action in &self.cfg.actions {
+            let color = match modules.iter().find(|&x| x.module.name() == action.module) {
+                Some(v) => v.color,
+                None => Color {
+                    r: 100,
+                    g: 100,
+                    b: 100,
+                },
+            };
+
             sb.push(Button {
                 index: action.btn,
                 module: action.module.to_uppercase(),
-                color: modules
-                    .iter()
-                    .find(|&x| x.module.name() == action.module)
-                    .unwrap()
-                    .color
-                    .clone(),
+                color: color,
                 action: action.desc.clone(),
                 value: "".to_string(),
             });
@@ -89,29 +99,28 @@ impl Controller {
         }
 
         self.modules = min;
-
-        for action in &self.cfg.actions {
-            let mut drw = Drawer::new();
-            self.sman
-                .set_button_image(
-                    action.btn,
-                    drw.draw(&action.module.to_uppercase(), &action.desc, ""),
-                )
-                .await;
-        }
     }
 
-    async fn render(mut sman: StreamDeckManager, buttons: Arc<Mutex<Vec<Button>>>) {
+    async fn render(
+        mut sman: StreamDeckManager,
+        buttons: Arc<Mutex<Vec<Button>>>,
+        mut trig: Receiver<bool>,
+    ) {
         loop {
             let btnstate = buttons.lock().await;
             for button in btnstate.iter() {
-                let mut drw = Drawer::new();
-                sman.set_button_image(
-                    button.index,
-                    drw.draw(&button.module.to_uppercase(), &button.action, &button.value),
-                )
-                .await;
+                {
+                    let img = Drawer::newdraw(
+                        button.color,
+                        &button.module.to_uppercase(),
+                        &button.action,
+                        &button.value,
+                    );
+                    let _ = sman.set_button_image(button.index, img).await;
+                }
             }
+
+            let _ = trig.recv().await;
         }
     }
 
@@ -129,10 +138,13 @@ impl Controller {
             let m = self.modules.get_mut(&act.module);
             match m {
                 Some(v) => {
+                    trace!("Trigger {} for {}", &act.action, &act.module);
                     v.trigger(&act.action).await;
                 }
                 None => println!("Notfound"),
             };
+
+            let _ = self.rendtrig.send(true).await;
         }
     }
 }

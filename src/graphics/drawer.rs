@@ -99,6 +99,23 @@ impl Drawer {
         graphics::output(self.dt.get_data())
     }
 
+    pub fn newdraw(
+        header_color: graphics::Color,
+        header: &str,
+        action: &str,
+        value: &str,
+    ) -> DynamicImage {
+        let mut d = Drawer::default();
+        d.border_accent = SolidSource {
+            r: header_color.r,
+            g: header_color.g,
+            b: header_color.b,
+            a: 0xff,
+        };
+        d.draw(header, action, value);
+        graphics::output(d.dt.get_data())
+    }
+
     fn header(&mut self, header_text: &str) {
         let mut pb = PathBuilder::new();
         //Background
@@ -124,11 +141,17 @@ impl Drawer {
             &DrawOptions::new(),
         );
 
-        let c = match COLORS.get(header_text) {
-            Some(v) => *v,
-            None => Color::new(255, 255, 100, 0),
-        };
+        // let c = match COLORS.get(header_text) {
+        //     Some(v) => *v,
+        //     None => Color::new(255, 255, 100, 0),
+        // };
 
+        let c = Color::new(
+            self.border_accent.a,
+            self.border_accent.r,
+            self.border_accent.g,
+            self.border_accent.b,
+        );
         //Border Accent
         let gradient = Source::new_linear_gradient(
             Gradient {

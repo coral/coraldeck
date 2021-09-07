@@ -1,4 +1,5 @@
 use image::DynamicImage;
+use log::error;
 use std::sync::Arc;
 use std::time::Instant;
 use streamdeck::StreamDeck;
@@ -97,7 +98,7 @@ impl StreamDeckManager {
                             }) {
                                 Ok(_) => {}
                                 Err(_) => {
-                                    panic!("poll loop broke? receivers pepega?");
+                                    error!("Streamdeck event loop could not feed channel");
                                 }
                             }
                         }
