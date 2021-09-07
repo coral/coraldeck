@@ -32,6 +32,19 @@
 			"desc": "ISO -"
 		},
 		{
+			"btn": 12,
+			"module": "camera",
+			"action": "wb_down",
+			"desc": "WB -",
+			"value": true
+		},
+		{
+			"btn": 13,
+			"module": "camera",
+			"action": "wb_up",
+			"desc": "WB +"
+		},
+		{
 			"btn": 3,
 			"module": "keylight",
 			"action": "left_light_up",

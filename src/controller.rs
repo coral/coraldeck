@@ -40,6 +40,8 @@ impl Controller {
     }
 
     async fn setup(&mut self, mut modules: Vec<Box<dyn Module + Send>>) {
+        self.sman.reset().await;
+
         //Setup routing
         for action in &self.cfg.actions {
             self.index.insert(action.btn, action.clone());

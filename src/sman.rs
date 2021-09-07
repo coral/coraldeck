@@ -75,6 +75,10 @@ impl StreamDeckManager {
         self.device.lock().await.set_button_image(button, image)
     }
 
+    pub async fn reset(&mut self) -> Result<(), streamdeck::Error> {
+        self.device.lock().await.reset()
+    }
+
     async fn poll(device: Arc<Mutex<StreamDeck>>, chan: Arc<Mutex<Sender<ButtonPress>>>) {
         let mut interval = time::interval(Duration::from_millis(1));
 
