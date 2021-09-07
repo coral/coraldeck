@@ -5,7 +5,7 @@ mod modules;
 mod sman;
 
 use config::Config;
-use controller::Controller;
+use controller::{Controller, ModuleConfig};
 use modules::{Camera, KeyLight, KeyLights, Module, MOTU};
 use sman::StreamDeckManager;
 use std::time::Duration;
@@ -22,12 +22,15 @@ async fn main() {
 
     // Module init
 
-    let mut m: Vec<Box<dyn Module + Send>> = Vec::new();
+    let mut m: Vec<ModuleConfig> = Vec::new();
     {
         //Motu
         let mut motu = MOTU::new(cfg.devices.motu.ip);
         motu.connect().await.unwrap();
-        m.push(Box::new(motu));
+        m.push(ModuleConfig {
+            module: Box::new(motu),
+            color: cfg.devices.motu.color,
+        });
         sgfx.load(&mut sman, "MOTU").await;
 
         //Keylights
@@ -37,13 +40,19 @@ async fn main() {
             lights.push(key);
         }
         let kl = KeyLights::new(lights).await;
-        m.push(Box::new(kl));
+        m.push(ModuleConfig {
+            module: Box::new(kl),
+            color: cfg.devices.keylight.color,
+        });
         sgfx.load(&mut sman, "KEYLIGHT").await;
 
         // //Camera
         // let mut cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
         // cam.connect(Duration::from_secs(10)).await.unwrap();
-        // m.push(Box::new(cam));
+        // m.push(ModuleConfig {
+        //     module: Box::new(cam),
+        //     color: cfg.devices.camera.color,
+        // });
         // sgfx.load(&mut sman, "CAMERA").await;
     }
     // Controller

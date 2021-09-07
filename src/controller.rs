@@ -1,45 +1,63 @@
 use crate::config::{Actions, Config};
-use crate::graphics::Drawer;
+use crate::graphics::{Color, Drawer};
 use crate::modules::Module;
 use crate::StreamDeckManager;
 use image::{ImageBuffer, Rgb};
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 
-struct Buffer {
-    normal: ImageBuffer<Rgb<u8>, Vec<u8>>,
-    pressed: ImageBuffer<Rgb<u8>, Vec<u8>>,
-}
 pub struct Controller {
     cfg: Arc<Config>,
     sman: StreamDeckManager,
 
     index: HashMap<u8, Actions>,
     modules: HashMap<String, Box<dyn Module + Send>>,
+
+    buttons: Arc<Mutex<Vec<Button>>>,
+}
+
+pub struct Button {
+    index: u8,
+    module: String,
+    color: Color,
+    action: String,
+    value: String,
+}
+
+pub struct ModuleConfig {
+    pub module: Box<dyn Module + Send>,
+    pub color: Color,
 }
 
 impl Controller {
     pub async fn new(
         cfg: Arc<Config>,
         sman: StreamDeckManager,
-        modules: Vec<Box<dyn Module + Send>>,
+        modules: Vec<ModuleConfig>,
     ) -> Controller {
         let mut ctrl = Controller {
             cfg,
             sman,
             index: HashMap::new(),
             modules: HashMap::new(),
+
+            buttons: Arc::new(Mutex::new(Vec::new())),
         };
 
-        //let mut call: HashMap<String, Box<dyn Module>> = HashMap::new();
-
         ctrl.setup(modules).await;
+
+        let render_deck = ctrl.sman.clone();
+        let render_list = ctrl.buttons.clone();
+
+        tokio::spawn(async move {
+            Controller::render(render_deck, render_list).await;
+        });
 
         ctrl
     }
 
-    async fn setup(&mut self, mut modules: Vec<Box<dyn Module + Send>>) {
+    async fn setup(&mut self, mut modules: Vec<ModuleConfig>) {
         self.sman.reset().await;
 
         //Setup routing
@@ -47,11 +65,27 @@ impl Controller {
             self.index.insert(action.btn, action.clone());
         }
 
+        let mut sb = self.buttons.lock().await;
+        for action in &self.cfg.actions {
+            sb.push(Button {
+                index: action.btn,
+                module: action.module.to_uppercase(),
+                color: modules
+                    .iter()
+                    .find(|&x| x.module.name() == action.module)
+                    .unwrap()
+                    .color
+                    .clone(),
+                action: action.desc.clone(),
+                value: "".to_string(),
+            });
+        }
+
         //Setup modules
         let mut min: HashMap<String, Box<dyn Module + Send>> = HashMap::new();
-        for module in modules.into_iter() {
-            let name = module.name();
-            min.insert(name, module);
+        for mc in modules.into_iter() {
+            let name = mc.module.name();
+            min.insert(name, mc.module);
         }
 
         self.modules = min;
@@ -64,6 +98,20 @@ impl Controller {
                     drw.draw(&action.module.to_uppercase(), &action.desc, ""),
                 )
                 .await;
+        }
+    }
+
+    async fn render(mut sman: StreamDeckManager, buttons: Arc<Mutex<Vec<Button>>>) {
+        loop {
+            let btnstate = buttons.lock().await;
+            for button in btnstate.iter() {
+                let mut drw = Drawer::new();
+                sman.set_button_image(
+                    button.index,
+                    drw.draw(&button.module.to_uppercase(), &button.action, &button.value),
+                )
+                .await;
+            }
         }
     }
 

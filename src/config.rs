@@ -1,3 +1,4 @@
+use crate::graphics::Color;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::net::Ipv4Addr;
@@ -31,19 +32,19 @@ pub struct Devices {
 #[serde(rename_all = "camelCase")]
 pub struct KeyLight {
     pub names: Vec<String>,
-    pub color: Vec<u8>,
+    pub color: Color,
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MOTU {
     pub ip: Ipv4Addr,
-    pub color: Vec<u8>,
+    pub color: Color,
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Camera {
     pub name: String,
-    pub color: Vec<u8>,
+    pub color: Color,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

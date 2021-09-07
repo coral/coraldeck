@@ -2,15 +2,27 @@
 	"devices": {
 		"keylight": {
 			"names": ["Key Light Left", "Key Light Right"],
-			"color": [255, 0, 255]
+			"color": {
+				"r": 255,
+				"g": 0,
+				"b": 255
+			}
 		},
 		"motu": {
 			"ip": "10.0.1.5",
-			"color": [45, 23, 255]
+			"color": {
+				"r": 45,
+				"g": 23,
+				"b": 255
+			}
 		},
 		"camera": {
 			"name": "A:4BE2529F",
-			"color": [255, 100, 0]
+			"color": {
+				"r": 255,
+				"g": 100,
+				"b": 0
+			}
 		}
 	},
 	"actions": [

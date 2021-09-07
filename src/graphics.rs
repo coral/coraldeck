@@ -2,6 +2,7 @@ mod drawer;
 mod startup;
 
 pub use drawer::Drawer;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 pub use startup::Startup;
 
 use image::{DynamicImage, Rgb, RgbImage};
@@ -26,4 +27,12 @@ pub fn output(data: &[u32]) -> DynamicImage {
     });
 
     DynamicImage::ImageRgb8(ni)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Color {
+    r: u8,
+    g: u8,
+    b: u8,
 }
