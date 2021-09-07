@@ -25,14 +25,14 @@ async fn main() {
     let mut m: Vec<Box<dyn Module + Send>> = Vec::new();
     {
         //Motu
-        let mut motu = MOTU::new(cfg.devices.motu);
+        let mut motu = MOTU::new(cfg.devices.motu.ip);
         motu.connect().await.unwrap();
         m.push(Box::new(motu));
         sgfx.load(&mut sman, "MOTU").await;
 
         //Keylights
         let mut lights: Vec<KeyLight> = Vec::new();
-        for l in &cfg.devices.keylight {
+        for l in &cfg.devices.keylight.names {
             let mut key = KeyLight::new_from_name(&l, true).await.unwrap();
             lights.push(key);
         }
@@ -40,11 +40,11 @@ async fn main() {
         m.push(Box::new(kl));
         sgfx.load(&mut sman, "KEYLIGHT").await;
 
-        //Camera
-        let mut cam = Camera::new(&cfg.devices.camera).await.unwrap();
-        cam.connect(Duration::from_secs(10)).await.unwrap();
-        m.push(Box::new(cam));
-        sgfx.load(&mut sman, "CAMERA").await;
+        // //Camera
+        // let mut cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
+        // cam.connect(Duration::from_secs(10)).await.unwrap();
+        // m.push(Box::new(cam));
+        // sgfx.load(&mut sman, "CAMERA").await;
     }
     // Controller
 

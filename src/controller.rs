@@ -73,7 +73,10 @@ impl Controller {
         loop {
             let event = events.recv().await.unwrap();
 
-            let act = self.index.get(&event.num).unwrap();
+            let act = match self.index.get(&event.num) {
+                Some(v) => v,
+                None => continue,
+            };
 
             let m = self.modules.get_mut(&act.module);
             match m {

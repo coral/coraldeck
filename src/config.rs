@@ -23,9 +23,27 @@ pub struct Config {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Devices {
-    pub keylight: Vec<String>,
-    pub motu: Ipv4Addr,
-    pub camera: String,
+    pub keylight: KeyLight,
+    pub motu: MOTU,
+    pub camera: Camera,
+}
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct KeyLight {
+    pub names: Vec<String>,
+    pub color: Vec<u8>,
+}
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MOTU {
+    pub ip: Ipv4Addr,
+    pub color: Vec<u8>,
+}
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Camera {
+    pub name: String,
+    pub color: Vec<u8>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]

@@ -1,10 +1,12 @@
 use crate::graphics;
+use big_s::S;
 use font_kit::family_name::FamilyName;
 use font_kit::font::Font;
 use font_kit::properties::{Properties, Weight};
 use font_kit::source::SystemSource;
 use image::DynamicImage;
 use raqote::*;
+use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 
@@ -14,6 +16,14 @@ lazy_static! {
         .unwrap()
         .load()
         .unwrap();
+    static ref COLORS: HashMap<String, Color> = {
+        let mut m = HashMap::new();
+        m.insert(S("CAMERA"), Color::new(255, 255, 100, 0));
+        m.insert(S("MOTU"), Color::new(255, 45, 23, 255));
+        m.insert(S("KEYLIGHT"), Color::new(255, 211, 0, 255));
+
+        m
+    };
 }
 
 pub struct Drawer {
@@ -114,14 +124,32 @@ impl Drawer {
             &DrawOptions::new(),
         );
 
+        let c = match COLORS.get(header_text) {
+            Some(v) => *v,
+            None => Color::new(255, 255, 100, 0),
+        };
+
         //Border Accent
-        let mut pb = PathBuilder::new();
-        pb.rect(0., 16., 15., 2.);
-        self.dt.fill(
-            &pb.finish(),
-            &Source::Solid(self.border_accent),
-            &DrawOptions::new(),
+        let gradient = Source::new_linear_gradient(
+            Gradient {
+                stops: vec![
+                    GradientStop {
+                        position: 0.0,
+                        color: c,
+                    },
+                    GradientStop {
+                        position: 1.0,
+                        color: Color::new(255, 70, 70, 70),
+                    },
+                ],
+            },
+            Point::new(0., 0.),
+            Point::new(72., 0.),
+            Spread::Pad,
         );
+        let mut pb = PathBuilder::new();
+        pb.rect(0., 16., 72., 4.);
+        self.dt.fill(&pb.finish(), &gradient, &DrawOptions::new());
 
         //Category text
         self.dt.draw_text(
@@ -138,7 +166,7 @@ impl Drawer {
         //Action Text
         self.dt.draw_text(
             &FONT,
-            20.,
+            16.,
             action,
             Point::new(5., 42.),
             &Source::Solid(self.text),
@@ -148,7 +176,7 @@ impl Drawer {
         //Value Text
         self.dt.draw_text(
             &FONT,
-            20.,
+            16.,
             value,
             Point::new(5., 65.),
             &Source::Solid(self.text),
