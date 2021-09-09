@@ -129,7 +129,7 @@ impl MOTU {
         let new_value = current + value;
 
         match self.set(key, new_value).await {
-            Ok(_) => Some(new_value.to_string()),
+            Ok(_) => Some(format!("{} dB", new_value.to_string())),
             Err(_) => None,
         }
     }

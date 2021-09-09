@@ -56,18 +56,20 @@ impl Module for KeyLight {
 
     async fn trigger(&mut self, action: &str) -> Option<String> {
         match action {
-            "light_up" => Some(
-                self.set_relative_brightness(0.05)
+            "light_up" => Some(format!(
+                "{}%",
+                self.set_relative_brightness(0.02)
                     .await
                     .unwrap()
-                    .to_string(),
-            ),
-            "light_down" => Some(
-                self.set_relative_brightness(-0.05)
+                    .to_string()
+            )),
+            "light_down" => Some(format!(
+                "{}%",
+                self.set_relative_brightness(-0.02)
                     .await
                     .unwrap()
-                    .to_string(),
-            ),
+                    .to_string()
+            )),
             "power_on" => match self.set_power(true).await {
                 Ok(_) => Some(S("ON")),
                 Err(_) => None,

@@ -85,7 +85,7 @@ async fn wb(cam: &mut BluetoothCamera, diff: i16) -> Option<String> {
                     )
                     .await;
 
-                return Some(nv.to_string());
+                return Some(format!("{} K", nv.to_string()));
             } else {
                 None
             }
