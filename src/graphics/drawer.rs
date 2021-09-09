@@ -132,15 +132,6 @@ impl Drawer {
             &DrawOptions::new(),
         );
 
-        //Border
-        let mut pb = PathBuilder::new();
-        pb.rect(0., 16., 72., 2.);
-        self.dt.fill(
-            &pb.finish(),
-            &Source::Solid(self.border),
-            &DrawOptions::new(),
-        );
-
         // let c = match COLORS.get(header_text) {
         //     Some(v) => *v,
         //     None => Color::new(255, 255, 100, 0),
@@ -171,7 +162,7 @@ impl Drawer {
             Spread::Pad,
         );
         let mut pb = PathBuilder::new();
-        pb.rect(0., 16., 72., 4.);
+        pb.rect(0., 17., 72., 4.);
         self.dt.fill(&pb.finish(), &gradient, &DrawOptions::new());
 
         //Category text
@@ -191,7 +182,7 @@ impl Drawer {
             &FONT,
             16.,
             action,
-            Point::new(5., 42.),
+            Point::new(5., 39.),
             &Source::Solid(self.text),
             &DrawOptions::new(),
         );

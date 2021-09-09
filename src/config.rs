@@ -54,7 +54,8 @@ pub struct Actions {
     pub module: String,
     pub action: String,
     pub desc: String,
-    pub value: Option<bool>,
+    pub value: String,
+    pub display: Option<String>,
 }
 
 impl Config {
