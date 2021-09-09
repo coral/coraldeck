@@ -31,6 +31,8 @@ pub struct MOTU {
 
     client: reqwest::Client,
     cache: Arc<Mutex<HashMap<String, Value>>>,
+
+    last_headphone_vol: f64,
 }
 
 impl MOTU {
@@ -48,6 +50,8 @@ impl MOTU {
 
             client: reqwest::Client::new(),
             cache: Arc::new(Mutex::new(HashMap::new())),
+
+            last_headphone_vol: 0.0,
         }
     }
 
@@ -133,6 +137,30 @@ impl MOTU {
             Err(_) => None,
         }
     }
+
+    pub async fn mute(&mut self, key: &str) -> Option<String> {
+        let current = match self.get(key).await {
+            Some(v) => match v.as_f64() {
+                Some(f) => f,
+                None => {
+                    return None;
+                }
+            },
+            None => {
+                return None;
+            }
+        };
+
+        if current == -127.0 {
+            self.set(key, self.last_headphone_vol).await;
+            Some(format!("{} dB", self.last_headphone_vol))
+        } else {
+            self.last_headphone_vol = current;
+            self.set(key, -127.0).await;
+
+            Some(format!("MUTED"))
+        }
+    }
 }
 
 #[async_trait]
@@ -145,6 +173,7 @@ impl Module for MOTU {
         match action {
             "vol_up" => self.set_relative("ext/obank/0/ch/0/stereoTrim", 5.0).await,
             "vol_down" => self.set_relative("ext/obank/0/ch/0/stereoTrim", -5.0).await,
+            "mute" => self.mute("ext/obank/0/ch/0/stereoTrim").await,
             _ => None,
         }
     }

@@ -42,6 +42,13 @@
 			"value": "volume"
 		},
 		{
+			"btn": 10,
+			"module": "motu",
+			"action": "mute",
+			"desc": "MUTE",
+			"value": "volume"
+		},
+		{
 			"btn": 2,
 			"module": "camera",
 			"action": "iso_up",
