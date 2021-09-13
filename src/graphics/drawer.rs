@@ -1,40 +1,35 @@
 use crate::graphics;
-use big_s::S;
 use font_kit::family_name::FamilyName;
 use font_kit::font::Font;
 use font_kit::properties::{Properties, Weight};
 use font_kit::source::SystemSource;
 use image::DynamicImage;
 use raqote::*;
-use std::collections::HashMap;
+use std::sync::Arc;
 
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref FONT: Font = SystemSource::new()
-        .select_best_match(
-            &[FamilyName::Title("Helvetica".into())],
-            &Properties::new().weight(Weight::MEDIUM),
-        )
-        .unwrap()
-        .load()
-        .unwrap();
-    static ref BOLDFONT: Font = SystemSource::new()
-        .select_best_match(
-            &[FamilyName::Title("Helvetica".into())],
-            &Properties::new().weight(Weight::BOLD),
-        )
-        .unwrap()
-        .load()
-        .unwrap();
-    static ref COLORS: HashMap<String, Color> = {
-        let mut m = HashMap::new();
-        m.insert(S("CAMERA"), Color::new(255, 255, 100, 0));
-        m.insert(S("MOTU"), Color::new(255, 45, 23, 255));
-        m.insert(S("KEYLIGHT"), Color::new(255, 211, 0, 255));
-
-        m
-    };
+    static ref FONT: Arc<Font> = Arc::new(
+        SystemSource::new()
+            .select_best_match(
+                &[FamilyName::Title("Helvetica".into())],
+                &Properties::new().weight(Weight::MEDIUM),
+            )
+            .unwrap()
+            .load()
+            .unwrap()
+    );
+    static ref BOLDFONT: Arc<Font> = Arc::new(
+        SystemSource::new()
+            .select_best_match(
+                &[FamilyName::Title("Helvetica".into())],
+                &Properties::new().weight(Weight::BOLD),
+            )
+            .unwrap()
+            .load()
+            .unwrap()
+    );
 }
 
 pub struct Drawer {

@@ -1,19 +1,8 @@
 use crate::graphics;
-use font_kit::font::Font;
 use font_kit::source::SystemSource;
 use raqote::*;
 
 use crate::sman::StreamDeckManager;
-
-use lazy_static::lazy_static;
-
-lazy_static! {
-    static ref FONT: Font = SystemSource::new()
-        .select_by_postscript_name("Helvetica")
-        .unwrap()
-        .load()
-        .unwrap();
-}
 
 pub struct Startup {
     bg: SolidSource,
@@ -71,6 +60,12 @@ impl Startup {
     }
 
     async fn draw_header(&mut self, sman: &mut StreamDeckManager) {
+        let font = SystemSource::new()
+            .select_by_postscript_name("Helvetica")
+            .unwrap()
+            .load()
+            .unwrap();
+
         for (index, c) in "CDECK".to_string().chars().enumerate() {
             let mut dt = DrawTarget::new(72, 72);
             let mut pb = PathBuilder::new();
@@ -79,7 +74,7 @@ impl Startup {
             dt.fill(&pb.finish(), &Source::Solid(self.bg), &DrawOptions::new());
 
             dt.draw_text(
-                &FONT,
+                &font,
                 24.,
                 &c.to_string(),
                 Point::new(30., 40.),
@@ -94,6 +89,12 @@ impl Startup {
     }
 
     pub async fn load(&mut self, sman: &mut StreamDeckManager, module: &str) {
+        let font = SystemSource::new()
+            .select_by_postscript_name("Helvetica")
+            .unwrap()
+            .load()
+            .unwrap();
+
         let mut dt = DrawTarget::new(72, 72);
         let mut pb = PathBuilder::new();
         //Background
@@ -102,7 +103,7 @@ impl Startup {
 
         //Category text
         dt.draw_text(
-            &FONT,
+            &font,
             16.,
             "LOADED:",
             Point::new(4., 22.),
@@ -111,7 +112,7 @@ impl Startup {
         );
 
         dt.draw_text(
-            &FONT,
+            &font,
             12.,
             module,
             Point::new(4., 42.),
