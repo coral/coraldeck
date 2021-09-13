@@ -112,7 +112,9 @@ impl Controller {
                             db.lock().await.insert(v.0, v.1);
                             let _ = rendtrig.send(true).await;
                         }
-                        None => {}
+                        None => {
+                            return;
+                        }
                     }
                 }
             });

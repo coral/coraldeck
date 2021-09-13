@@ -11,6 +11,7 @@ use std::ops::DerefMut;
 use std::sync::Arc;
 use std::time::Duration;
 use thiserror::Error;
+use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
 use tokio::time;
 
@@ -30,6 +31,7 @@ pub struct MOTU {
     cache: Arc<Mutex<HashMap<String, Value>>>,
 
     last_headphone_vol: f64,
+    rendtrig: Option<Sender<(String, String)>>,
 }
 
 impl MOTU {
@@ -49,6 +51,7 @@ impl MOTU {
             cache: Arc::new(Mutex::new(HashMap::new())),
 
             last_headphone_vol: 0.0,
+            rendtrig: None,
         }
     }
 
@@ -61,7 +64,7 @@ impl MOTU {
         let url = self.url.clone();
         let client = self.client.clone();
         tokio::spawn(async move {
-            let mut interval = time::interval(Duration::from_secs(10));
+            let mut interval = time::interval(Duration::from_secs(5));
             loop {
                 match MOTU::get_cache(client.clone(), url.clone()).await {
                     Ok(data) => {
@@ -177,6 +180,20 @@ impl Module for MOTU {
 
     async fn subscribe(&mut self) -> tokio::sync::mpsc::Receiver<(String, String)> {
         let (tx, rx) = tokio::sync::mpsc::channel(16);
+
+        self.rendtrig = Some(tx.clone());
+
+        let cache = self.cache.clone();
+        tokio::spawn(async move {
+            match cache.lock().await.get("ext/obank/0/ch/0/stereoTrim") {
+                Some(val) => {
+                    let _ = tx
+                        .send(("motu_volume".to_string(), format!("{} dB", val.to_string())))
+                        .await;
+                }
+                None => {}
+            };
+        });
 
         rx
     }
