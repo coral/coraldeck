@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use big_s::S;
 use log::error;
 use rand::Rng;
-use serde_json::{json, to_string, Value};
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::net::Ipv4Addr;
@@ -109,7 +109,7 @@ impl MOTU {
 
         let res = self.client.patch(url).multipart(form).send().await?;
 
-        let ok = self
+        let _ = self
             .cache
             .lock()
             .await

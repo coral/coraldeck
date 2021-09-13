@@ -2,7 +2,7 @@ mod drawer;
 mod startup;
 
 pub use drawer::Drawer;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 pub use startup::Startup;
 
 use image::{DynamicImage, Rgb, RgbImage};

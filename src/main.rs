@@ -6,12 +6,9 @@ mod sman;
 
 use config::Config;
 use controller::{Controller, ModuleConfig};
-use modules::{Camera, KeyLight, KeyLights, Module, MOTU};
+use modules::{Camera, KeyLight, KeyLights, MOTU};
 use sman::StreamDeckManager;
 use std::time::Duration;
-
-#[macro_use]
-extern crate lazy_static;
 
 extern crate pretty_env_logger;
 #[macro_use]
@@ -42,7 +39,7 @@ async fn main() {
         //Keylights
         let mut lights: Vec<KeyLight> = Vec::new();
         for l in &cfg.devices.keylight.names {
-            let mut key = KeyLight::new_from_name(&l, Some(Duration::from_secs(5)))
+            let key = KeyLight::new_from_name(&l, Some(Duration::from_secs(5)))
                 .await
                 .unwrap();
             lights.push(key);
@@ -55,7 +52,7 @@ async fn main() {
         sgfx.load(&mut sman, "KEYLIGHT").await;
 
         //Camera
-        let mut cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
+        let cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
         m.push(ModuleConfig {
             module: Box::new(cam),
             color: cfg.devices.camera.color,

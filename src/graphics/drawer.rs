@@ -1,8 +1,6 @@
 use crate::graphics;
 use big_s::S;
-use font_kit::family_name::FamilyName;
 use font_kit::font::Font;
-use font_kit::properties::{Properties, Weight};
 use font_kit::source::SystemSource;
 use image::DynamicImage;
 use raqote::*;
@@ -31,7 +29,6 @@ pub struct Drawer {
 
     bg: SolidSource,
     text_bg: SolidSource,
-    border: SolidSource,
     border_accent: SolidSource,
 
     text: SolidSource,
@@ -54,13 +51,6 @@ impl Default for Drawer {
                 r: 25,
                 g: 25,
                 b: 25,
-                a: 0xff,
-            },
-
-            border: SolidSource {
-                r: 117,
-                g: 117,
-                b: 117,
                 a: 0xff,
             },
 
@@ -89,10 +79,6 @@ impl Default for Drawer {
 }
 
 impl Drawer {
-    pub fn new() -> Drawer {
-        Drawer::default()
-    }
-
     pub fn draw(&mut self, header: &str, action: &str, value: &str) -> DynamicImage {
         self.header(header);
         self.content(action, value);

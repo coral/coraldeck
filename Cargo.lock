@@ -2327,7 +2327,9 @@ dependencies = [
 
 [[package]]
 name = "streamdeck"
-version = "0.4.7"
+version = "0.4.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ad5b095658ae849a575f08f3ea6e39c885858988488099bf6a080787c5b3cdb"
 dependencies = [
  "hidapi",
  "humantime",

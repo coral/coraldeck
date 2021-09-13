@@ -90,7 +90,7 @@ impl Controller {
                 color: color,
                 action: action.desc.clone(),
                 display: match &action.display {
-                    Some(v) => Some(format!("{}_{}", &action.module, &action.value)),
+                    Some(_) => Some(format!("{}_{}", &action.module, &action.value)),
                     None => None,
                 },
             });

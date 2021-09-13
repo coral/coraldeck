@@ -1,9 +1,6 @@
 use crate::graphics;
-use font_kit::family_name::FamilyName;
 use font_kit::font::Font;
-use font_kit::properties::{Properties, Weight};
 use font_kit::source::SystemSource;
-use image::DynamicImage;
 use raqote::*;
 
 use crate::sman::StreamDeckManager;
@@ -24,8 +21,6 @@ pub struct Startup {
     header_text: SolidSource,
     loaded_text: SolidSource,
     text: SolidSource,
-
-    load_bg: SolidSource,
 
     loadcount: u32,
 }
@@ -62,13 +57,6 @@ impl Default for Startup {
             },
 
             loadcount: 0,
-
-            load_bg: SolidSource {
-                r: 20,
-                g: 40,
-                b: 20,
-                a: 0xff,
-            },
         }
     }
 }
@@ -76,7 +64,7 @@ impl Default for Startup {
 impl Startup {
     pub async fn new(sman: &mut StreamDeckManager) -> Startup {
         let mut d = Startup::default();
-        sman.reset().await;
+        let _ = sman.reset().await;
         d.draw_header(sman).await;
 
         d
@@ -99,7 +87,8 @@ impl Startup {
                 &DrawOptions::new(),
             );
 
-            sman.set_button_image(index as u8, graphics::output(dt.get_data()))
+            let _ = sman
+                .set_button_image(index as u8, graphics::output(dt.get_data()))
                 .await;
         }
     }
@@ -130,7 +119,8 @@ impl Startup {
             &DrawOptions::new(),
         );
 
-        sman.set_button_image((self.loadcount + 5) as u8, graphics::output(dt.get_data()))
+        let _ = sman
+            .set_button_image((self.loadcount + 5) as u8, graphics::output(dt.get_data()))
             .await;
 
         self.loadcount = self.loadcount + 1;
