@@ -125,6 +125,7 @@ impl Drawer {
     }
 
     fn header(&mut self, header_text: &str) {
+        let font = FONT.clone();
         let mut pb = PathBuilder::new();
         //Background
         pb.rect(0., 0., 72., 72.);
@@ -175,7 +176,7 @@ impl Drawer {
 
         //Category text
         self.dt.draw_text(
-            &FONT,
+            &font,
             12.,
             header_text,
             Point::new(6., 12.),
@@ -207,9 +208,12 @@ impl Drawer {
     }
 
     fn content(&mut self, action: &str, value: &str) {
+        let font = FONT.clone();
+        let boldfont = BOLDFONT.clone();
+
         //Action Text
         self.dt.draw_text(
-            &FONT,
+            &font,
             16.,
             action,
             Point::new(5., 39.),
@@ -219,7 +223,7 @@ impl Drawer {
 
         //Value Text
         self.dt.draw_text(
-            &BOLDFONT,
+            &boldfont,
             16.,
             value,
             Point::new(5., 63.),
