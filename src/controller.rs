@@ -102,36 +102,36 @@ impl Controller {
         let mut min: HashMap<String, Box<dyn Module + Send>> = HashMap::new();
         for mut mc in modules.into_iter() {
             let name = mc.module.name();
+
+            let mut updates = mc.module.subscribe().await;
+            let db = self.values.clone();
+            let rendtrig = self.rendtrig.clone();
+            tokio::spawn(async move {
+                loop {
+                    match updates.recv().await {
+                        Some(v) => {
+                            db.lock().await.insert(v.0, v.1);
+                            let _ = rendtrig.send(true).await;
+                        }
+                        None => {}
+                    }
+                }
+            });
+
             min.insert(name, mc.module);
         }
 
         self.modules = min;
 
-        let (upd_tx, mut upd_rx) = mpsc::channel(32);
-
         for action in &self.cfg.actions {
             match &action.display {
                 Some(val) => match self.modules.get_mut(&action.module) {
-                    Some(module) => {
-                        module
-                            .subscribe(SubscribedValue {
-                                name: val.to_string(),
-                                channel: upd_tx.clone(),
-                            })
-                            .await;
-                    }
+                    Some(module) => {}
                     None => {}
                 },
                 None => {}
             }
         }
-
-        tokio::spawn(async move {
-            loop {
-                let update = upd_rx.recv().await;
-                //dbg!(update);
-            }
-        });
     }
 
     async fn render(
@@ -186,10 +186,10 @@ impl Controller {
                     trace!("Trigger {} for {}", &act.action, &act.module);
                     match v.trigger(&act.action).await {
                         Some(newvalue) => {
-                            self.values
-                                .lock()
-                                .await
-                                .insert(format!("{}_{}", &act.module, &act.value), newvalue);
+                            // self.values
+                            //     .lock()
+                            //     .await
+                            //     .insert(format!("{}_{}", &act.module, &act.value), newvalue);
                         }
                         None => {}
                     }
@@ -197,7 +197,7 @@ impl Controller {
                 None => println!("Notfound"),
             };
 
-            let _ = self.rendtrig.send(true).await;
+            //let _ = self.rendtrig.send(true).await;
         }
     }
 }

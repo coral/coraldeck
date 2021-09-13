@@ -176,5 +176,9 @@ impl Module for MOTU {
         }
     }
 
-    async fn subscribe(&mut self, sub: SubscribedValue) {}
+    async fn subscribe(&mut self) -> tokio::sync::mpsc::Receiver<(String, String)> {
+        let (tx, rx) = tokio::sync::mpsc::channel(16);
+
+        rx
+    }
 }

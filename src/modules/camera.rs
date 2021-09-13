@@ -1,5 +1,4 @@
 use crate::modules::Module;
-use crate::modules::SubscribedValue;
 use async_trait::async_trait;
 use big_s::S;
 use blackmagic_camera_control::command::{Command, Video};
@@ -8,9 +7,9 @@ use blackmagic_camera_control::Operation;
 
 use blackmagic_camera_control::error::BluetoothCameraError;
 use lazy_static::lazy_static;
-use std::collections::HashMap;
 use std::time::Duration;
-use tokio::sync::mpsc::{Receiver, Sender};
+use tokio::sync::broadcast::error::RecvError;
+use tokio::sync::mpsc::{self, Receiver};
 
 lazy_static! {
     static ref ISO: Vec<i32> = vec![
@@ -21,7 +20,6 @@ lazy_static! {
 
 pub struct Camera {
     cam: BluetoothCamera,
-    subscriptions: tokio::sync::mpsc::Sender<SubscribedValue>,
 }
 
 impl Camera {
@@ -29,40 +27,7 @@ impl Camera {
         let mut cam = BluetoothCamera::new(cam).await?;
         cam.connect(Duration::from_secs(10)).await?;
 
-        let mut updates = cam.updates().await;
-        let (sub_tx, mut sub_rx): (Sender<SubscribedValue>, Receiver<SubscribedValue>) =
-            tokio::sync::mpsc::channel(32);
-
-        tokio::spawn(async move {
-            let mut intstore: HashMap<String, tokio::sync::mpsc::Sender<String>> = HashMap::new();
-            loop {
-                tokio::select! {
-                    update = updates.recv() => {match update {
-                        Ok(update) => {
-                            //update.normalized_name()
-
-
-                        }
-                        Err(_) => {
-                            return;
-                        }
-                    }}
-                    sub = sub_rx.recv() => {
-                        match sub {
-                            Some(sn) => {
-                                intstore.insert(sn.name, sn.channel);
-                            },
-                            None => {}
-                        }
-                    }
-                };
-            }
-        });
-
-        Ok(Camera {
-            cam,
-            subscriptions: sub_tx,
-        })
+        Ok(Camera { cam })
     }
 }
 
@@ -82,8 +47,34 @@ impl Module for Camera {
         }
     }
 
-    async fn subscribe(&mut self, sub: SubscribedValue) {
-        self.subscriptions.send(sub).await;
+    async fn subscribe(&mut self) -> Receiver<(String, String)> {
+        let (tx, rx) = mpsc::channel(16);
+        let mut camupdates = self.cam.updates().await;
+        let name = self.name();
+
+        tokio::spawn(async move {
+            loop {
+                let update: Result<Command, RecvError> = camupdates.recv().await;
+                match update {
+                    Ok(u) => {
+                        let _ = tx
+                            .send((
+                                format!(
+                                    "{}_{}_{}",
+                                    &name,
+                                    u.normalized_name().0,
+                                    u.normalized_name().1
+                                ),
+                                u.to_string(),
+                            ))
+                            .await;
+                    }
+                    Err(_) => {}
+                }
+            }
+        });
+
+        rx
     }
 }
 

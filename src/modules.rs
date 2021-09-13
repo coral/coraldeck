@@ -5,7 +5,7 @@ pub mod motu;
 pub use camera::Camera;
 pub use keylight::{KeyLight, KeyLights};
 pub use motu::MOTU;
-use tokio::sync::mpsc::Sender;
+use tokio::sync::mpsc::{Receiver, Sender};
 
 use async_trait::async_trait;
 
@@ -15,7 +15,7 @@ pub trait Module {
 
     async fn trigger(&mut self, action: &str) -> Option<String>;
 
-    async fn subscribe(&mut self, sub: SubscribedValue);
+    async fn subscribe(&mut self) -> Receiver<(String, String)>;
 }
 
 #[derive(Clone, Debug)]

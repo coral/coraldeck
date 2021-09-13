@@ -42,7 +42,9 @@ async fn main() {
         //Keylights
         let mut lights: Vec<KeyLight> = Vec::new();
         for l in &cfg.devices.keylight.names {
-            let mut key = KeyLight::new_from_name(&l, true).await.unwrap();
+            let mut key = KeyLight::new_from_name(&l, Some(Duration::from_secs(5)))
+                .await
+                .unwrap();
             lights.push(key);
         }
         let kl = KeyLights::new(lights).await;
