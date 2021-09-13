@@ -106,7 +106,7 @@ async fn iso(cam: &mut BluetoothCamera, direction: &str) -> Option<String> {
                             .write(255, Operation::AssignValue, Command::Video(Video::Iso(nv)))
                             .await;
 
-                        return Some(nv.to_string());
+                        return None;
                     }
                     None => None,
                 }

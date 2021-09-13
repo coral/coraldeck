@@ -1,5 +1,4 @@
 use crate::modules::Module;
-use crate::modules::SubscribedValue;
 use async_trait::async_trait;
 use big_s::S;
 pub use elgato_keylight::KeyLight;
@@ -7,7 +6,7 @@ use tokio::sync::mpsc::Sender;
 
 pub struct KeyLights {
     lights: Vec<KeyLight>,
-    rendtrig: Option<Sender<bool>>,
+    rendtrig: Option<Sender<(String, String)>>,
 }
 
 impl KeyLights {
@@ -55,6 +54,30 @@ impl Module for KeyLights {
 
     async fn subscribe(&mut self) -> tokio::sync::mpsc::Receiver<(String, String)> {
         let (tx, rx) = tokio::sync::mpsc::channel(16);
+
+        self.rendtrig = Some(tx.clone());
+
+        let _ = tx
+            .send((
+                S("keylight_left_intensity"),
+                format!(
+                    "{}%",
+                    self.lights[0].get().await.unwrap().lights[0].brightness
+                )
+                .to_string(),
+            ))
+            .await;
+
+        let _ = tx
+            .send((
+                S("keylight_right_intensity"),
+                format!(
+                    "{}%",
+                    self.lights[1].get().await.unwrap().lights[0].brightness
+                )
+                .to_string(),
+            ))
+            .await;
 
         rx
     }

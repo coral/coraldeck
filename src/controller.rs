@@ -1,9 +1,7 @@
 use crate::config::{Actions, Config};
 use crate::graphics::{Color, Drawer};
-use crate::modules::{Module, SubscribedValue};
+use crate::modules::Module;
 use crate::StreamDeckManager;
-use big_s::S;
-use image::{ImageBuffer, Rgb};
 use log::trace;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -67,7 +65,7 @@ impl Controller {
         ctrl
     }
 
-    async fn setup(&mut self, mut modules: Vec<ModuleConfig>) {
+    async fn setup(&mut self, modules: Vec<ModuleConfig>) {
         let _ = self.sman.reset().await;
 
         //Setup routing
@@ -103,6 +101,7 @@ impl Controller {
         for mut mc in modules.into_iter() {
             let name = mc.module.name();
 
+            //Hook up value updates
             let mut updates = mc.module.subscribe().await;
             let db = self.values.clone();
             let rendtrig = self.rendtrig.clone();
@@ -122,16 +121,6 @@ impl Controller {
         }
 
         self.modules = min;
-
-        for action in &self.cfg.actions {
-            match &action.display {
-                Some(val) => match self.modules.get_mut(&action.module) {
-                    Some(module) => {}
-                    None => {}
-                },
-                None => {}
-            }
-        }
     }
 
     async fn render(
@@ -186,18 +175,19 @@ impl Controller {
                     trace!("Trigger {} for {}", &act.action, &act.module);
                     match v.trigger(&act.action).await {
                         Some(newvalue) => {
-                            // self.values
-                            //     .lock()
-                            //     .await
-                            //     .insert(format!("{}_{}", &act.module, &act.value), newvalue);
+                            //New value, update
+                            self.values
+                                .lock()
+                                .await
+                                .insert(format!("{}_{}", &act.module, &act.value), newvalue);
+
+                            let _ = self.rendtrig.send(true).await;
                         }
                         None => {}
                     }
                 }
                 None => println!("Notfound"),
             };
-
-            //let _ = self.rendtrig.send(true).await;
         }
     }
 }

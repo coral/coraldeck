@@ -1,5 +1,4 @@
 use crate::modules::Module;
-use crate::modules::SubscribedValue;
 use async_trait::async_trait;
 use big_s::S;
 use log::error;
