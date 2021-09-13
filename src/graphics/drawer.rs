@@ -1,6 +1,8 @@
 use crate::graphics;
 use big_s::S;
+use font_kit::family_name::FamilyName;
 use font_kit::font::Font;
+use font_kit::properties::{Properties, Weight};
 use font_kit::source::SystemSource;
 use image::DynamicImage;
 use raqote::*;
@@ -10,7 +12,18 @@ use lazy_static::lazy_static;
 
 lazy_static! {
     static ref FONT: Font = SystemSource::new()
-        .select_by_postscript_name("Helvetica")
+        .select_best_match(
+            &[FamilyName::Title("Helvetica".into())],
+            &Properties::new().weight(Weight::MEDIUM),
+        )
+        .unwrap()
+        .load()
+        .unwrap();
+    static ref BOLDFONT: Font = SystemSource::new()
+        .select_best_match(
+            &[FamilyName::Title("Helvetica".into())],
+            &Properties::new().weight(Weight::BOLD),
+        )
         .unwrap()
         .load()
         .unwrap();
@@ -33,6 +46,8 @@ pub struct Drawer {
 
     text: SolidSource,
     category_text: SolidSource,
+
+    grdbg: SolidSource,
 }
 
 impl Default for Drawer {
@@ -72,6 +87,13 @@ impl Default for Drawer {
                 r: 160,
                 g: 160,
                 b: 160,
+                a: 0xff,
+            },
+
+            grdbg: SolidSource {
+                r: 10,
+                g: 10,
+                b: 10,
                 a: 0xff,
             },
         }
@@ -160,6 +182,28 @@ impl Drawer {
             &Source::Solid(self.category_text),
             &DrawOptions::new(),
         );
+
+        //Border Accent
+        let gradient = Source::new_linear_gradient(
+            Gradient {
+                stops: vec![
+                    GradientStop {
+                        position: 0.0,
+                        color: Color::new(self.bg.a, self.bg.r, self.bg.g, self.bg.b),
+                    },
+                    GradientStop {
+                        position: 1.0,
+                        color: Color::new(self.grdbg.a, self.grdbg.r, self.grdbg.g, self.grdbg.b),
+                    },
+                ],
+            },
+            Point::new(0., 0.),
+            Point::new(0., 52.),
+            Spread::Pad,
+        );
+        let mut pb = PathBuilder::new();
+        pb.rect(0., 20., 72., 52.);
+        self.dt.fill(&pb.finish(), &gradient, &DrawOptions::new());
     }
 
     fn content(&mut self, action: &str, value: &str) {
@@ -175,10 +219,10 @@ impl Drawer {
 
         //Value Text
         self.dt.draw_text(
-            &FONT,
+            &BOLDFONT,
             16.,
             value,
-            Point::new(5., 65.),
+            Point::new(5., 63.),
             &Source::Solid(self.text),
             &DrawOptions::new(),
         );
