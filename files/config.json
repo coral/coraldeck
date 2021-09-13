@@ -53,30 +53,30 @@
 			"module": "camera",
 			"action": "iso_up",
 			"desc": "ISO +",
-			"value": "iso",
-			"display": "iso"
+			"value": "video_iso",
+			"display": "video_iso"
 		},
 		{
 			"btn": 7,
 			"module": "camera",
 			"action": "iso_down",
 			"desc": "ISO -",
-			"value": "iso"
+			"value": "video_iso"
 		},
 		{
 			"btn": 1,
 			"module": "camera",
 			"action": "wb_up",
 			"desc": "WB +",
-			"value": "wb",
-			"display": "wb"
+			"value": "video_manual_white_balance",
+			"display": "video_manual_white_balance"
 		},
 		{
 			"btn": 6,
 			"module": "camera",
 			"action": "wb_down",
 			"desc": "WB -",
-			"value": "wb"
+			"value": "video_manual_white_balance"
 		},
 		{
 			"btn": 3,

@@ -1,4 +1,5 @@
 use crate::modules::Module;
+use crate::modules::SubscribedValue;
 use async_trait::async_trait;
 use big_s::S;
 use log::error;
@@ -16,9 +17,6 @@ use tokio::time;
 
 #[derive(Error, Debug)]
 pub enum MOTUError {
-    #[error("ParseError")]
-    ParseError,
-
     #[error(transparent)]
     RequestError(#[from] reqwest::Error),
 }
@@ -119,7 +117,7 @@ impl MOTU {
     }
 
     pub async fn set_relative(&mut self, key: &str, value: f64) -> Option<String> {
-        let mut current = match self.get(key).await {
+        let current = match self.get(key).await {
             Some(v) => match v.as_f64() {
                 Some(f) => f,
                 None => {
@@ -152,11 +150,11 @@ impl MOTU {
         };
 
         if current == -127.0 {
-            self.set(key, self.last_headphone_vol).await;
+            self.set(key, self.last_headphone_vol).await.ok();
             Some(format!("{} dB", self.last_headphone_vol))
         } else {
             self.last_headphone_vol = current;
-            self.set(key, -127.0).await;
+            self.set(key, -127.0).await.ok();
 
             Some(format!("MUTED"))
         }
@@ -177,4 +175,6 @@ impl Module for MOTU {
             _ => None,
         }
     }
+
+    async fn subscribe(&mut self, sub: SubscribedValue) {}
 }

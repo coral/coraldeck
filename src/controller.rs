@@ -1,6 +1,6 @@
 use crate::config::{Actions, Config};
 use crate::graphics::{Color, Drawer};
-use crate::modules::Module;
+use crate::modules::{Module, SubscribedValue};
 use crate::StreamDeckManager;
 use big_s::S;
 use image::{ImageBuffer, Rgb};
@@ -100,12 +100,38 @@ impl Controller {
 
         //Setup modules
         let mut min: HashMap<String, Box<dyn Module + Send>> = HashMap::new();
-        for mc in modules.into_iter() {
+        for mut mc in modules.into_iter() {
             let name = mc.module.name();
             min.insert(name, mc.module);
         }
 
         self.modules = min;
+
+        let (upd_tx, mut upd_rx) = mpsc::channel(32);
+
+        for action in &self.cfg.actions {
+            match &action.display {
+                Some(val) => match self.modules.get_mut(&action.module) {
+                    Some(module) => {
+                        module
+                            .subscribe(SubscribedValue {
+                                name: val.to_string(),
+                                channel: upd_tx.clone(),
+                            })
+                            .await;
+                    }
+                    None => {}
+                },
+                None => {}
+            }
+        }
+
+        tokio::spawn(async move {
+            loop {
+                let update = upd_rx.recv().await;
+                //dbg!(update);
+            }
+        });
     }
 
     async fn render(

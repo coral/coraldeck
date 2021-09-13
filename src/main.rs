@@ -54,7 +54,6 @@ async fn main() {
 
         //Camera
         let mut cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
-        cam.connect(Duration::from_secs(10)).await.unwrap();
         m.push(ModuleConfig {
             module: Box::new(cam),
             color: cfg.devices.camera.color,

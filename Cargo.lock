@@ -135,9 +135,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "blackmagic-camera-control"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17c44d920d97e8db0876898b957ae078989a0ac07b298b6e7849dade1204b4e7"
+checksum = "fbef7d6d8c3fbc1b57ffc92f21f01ed1553f8ff2abd75e28e9209f904545afd7"
 dependencies = [
  "btleplug",
  "codegen",

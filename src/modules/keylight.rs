@@ -1,15 +1,21 @@
 use crate::modules::Module;
+use crate::modules::SubscribedValue;
 use async_trait::async_trait;
 use big_s::S;
 pub use elgato_keylight::KeyLight;
+use tokio::sync::mpsc::Sender;
 
 pub struct KeyLights {
     lights: Vec<KeyLight>,
+    rendtrig: Option<Sender<bool>>,
 }
 
 impl KeyLights {
     pub async fn new(lights: Vec<KeyLight>) -> KeyLights {
-        KeyLights { lights }
+        KeyLights {
+            lights,
+            rendtrig: None,
+        }
     }
 
     async fn toggle(&mut self) -> String {
@@ -46,6 +52,8 @@ impl Module for KeyLights {
             _ => None,
         }
     }
+
+    async fn subscribe(&mut self, sub: SubscribedValue) {}
 }
 
 #[async_trait]
@@ -82,4 +90,6 @@ impl Module for KeyLight {
             _ => None,
         }
     }
+
+    async fn subscribe(&mut self, sub: SubscribedValue) {}
 }

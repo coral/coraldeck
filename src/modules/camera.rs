@@ -1,11 +1,16 @@
 use crate::modules::Module;
+use crate::modules::SubscribedValue;
 use async_trait::async_trait;
 use big_s::S;
 use blackmagic_camera_control::command::{Command, Video};
 pub use blackmagic_camera_control::BluetoothCamera;
 use blackmagic_camera_control::Operation;
 
+use blackmagic_camera_control::error::BluetoothCameraError;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
+use std::time::Duration;
+use tokio::sync::mpsc::{Receiver, Sender};
 
 lazy_static! {
     static ref ISO: Vec<i32> = vec![
@@ -14,20 +19,71 @@ lazy_static! {
     ];
 }
 
+pub struct Camera {
+    cam: BluetoothCamera,
+    subscriptions: tokio::sync::mpsc::Sender<SubscribedValue>,
+}
+
+impl Camera {
+    pub async fn new(cam: &str) -> Result<Camera, BluetoothCameraError> {
+        let mut cam = BluetoothCamera::new(cam).await?;
+        cam.connect(Duration::from_secs(10)).await?;
+
+        let mut updates = cam.updates().await;
+        let (sub_tx, mut sub_rx): (Sender<SubscribedValue>, Receiver<SubscribedValue>) =
+            tokio::sync::mpsc::channel(32);
+
+        tokio::spawn(async move {
+            let mut intstore: HashMap<String, tokio::sync::mpsc::Sender<String>> = HashMap::new();
+            loop {
+                tokio::select! {
+                    update = updates.recv() => {match update {
+                        Ok(update) => {
+                            //update.normalized_name()
+
+
+                        }
+                        Err(_) => {
+                            return;
+                        }
+                    }}
+                    sub = sub_rx.recv() => {
+                        match sub {
+                            Some(sn) => {
+                                intstore.insert(sn.name, sn.channel);
+                            },
+                            None => {}
+                        }
+                    }
+                };
+            }
+        });
+
+        Ok(Camera {
+            cam,
+            subscriptions: sub_tx,
+        })
+    }
+}
+
 #[async_trait]
-impl Module for BluetoothCamera {
+impl Module for Camera {
     fn name(&self) -> String {
         return S("camera");
     }
 
     async fn trigger(&mut self, action: &str) -> Option<String> {
         match action {
-            "iso_up" => iso(self, "up").await,
-            "iso_down" => iso(self, "down").await,
-            "wb_up" => wb(self, 200).await,
-            "wb_down" => wb(self, -200).await,
+            "iso_up" => iso(&mut self.cam, "up").await,
+            "iso_down" => iso(&mut self.cam, "down").await,
+            "wb_up" => wb(&mut self.cam, 200).await,
+            "wb_down" => wb(&mut self.cam, -200).await,
             _ => None,
         }
+    }
+
+    async fn subscribe(&mut self, sub: SubscribedValue) {
+        self.subscriptions.send(sub).await;
     }
 }
 
