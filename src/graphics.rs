@@ -1,7 +1,9 @@
 mod drawer;
+mod fontloader;
 mod startup;
 
 pub use drawer::Drawer;
+pub use fontloader::FontLoader;
 use serde::{Deserialize, Serialize};
 pub use startup::Startup;
 

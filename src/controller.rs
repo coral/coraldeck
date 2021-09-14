@@ -1,5 +1,5 @@
 use crate::config::{Actions, Config};
-use crate::graphics::{Color, Drawer};
+use crate::graphics::{self, Color, Drawer};
 use crate::modules::Module;
 use crate::StreamDeckManager;
 use log::trace;
@@ -131,6 +131,7 @@ impl Controller {
         values: Arc<Mutex<HashMap<String, String>>>,
         mut trig: Receiver<bool>,
     ) {
+        let font = graphics::FontLoader::new();
         loop {
             {
                 let btnstate = buttons.lock().await;
@@ -147,6 +148,7 @@ impl Controller {
                         };
 
                         let img = Drawer::newdraw(
+                            &font,
                             button.color,
                             &button.module.to_uppercase(),
                             &button.action,

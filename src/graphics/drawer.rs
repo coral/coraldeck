@@ -1,36 +1,8 @@
 use crate::graphics;
-use font_kit::family_name::FamilyName;
-use font_kit::font::Font;
-use font_kit::properties::{Properties, Weight};
-use font_kit::source::SystemSource;
 use image::DynamicImage;
 use raqote::*;
-use std::sync::{Arc, Mutex};
 
-use lazy_static::lazy_static;
-
-lazy_static! {
-    static ref FONT: Arc<Mutex<Font>> = Arc::new(Mutex::new(
-        SystemSource::new()
-            .select_best_match(
-                &[FamilyName::Title("Helvetica".into())],
-                &Properties::new().weight(Weight::MEDIUM),
-            )
-            .unwrap()
-            .load()
-            .unwrap()
-    ));
-    static ref BOLDFONT: Arc<Mutex<Font>> = Arc::new(Mutex::new(
-        SystemSource::new()
-            .select_best_match(
-                &[FamilyName::Title("Helvetica".into())],
-                &Properties::new().weight(Weight::BOLD),
-            )
-            .unwrap()
-            .load()
-            .unwrap()
-    ));
-}
+use super::FontLoader;
 
 pub struct Drawer {
     dt: DrawTarget,
@@ -96,13 +68,20 @@ impl Default for Drawer {
 }
 
 impl Drawer {
-    pub fn draw(&mut self, header: &str, action: &str, value: &str) -> DynamicImage {
-        self.header(header);
-        self.content(action, value);
+    pub fn draw(
+        &mut self,
+        font: &FontLoader,
+        header: &str,
+        action: &str,
+        value: &str,
+    ) -> DynamicImage {
+        self.header(font, header);
+        self.content(font, action, value);
         graphics::output(self.dt.get_data())
     }
 
     pub fn newdraw(
+        font: &FontLoader,
         header_color: graphics::Color,
         header: &str,
         action: &str,
@@ -115,11 +94,11 @@ impl Drawer {
             b: header_color.b,
             a: 0xff,
         };
-        d.draw(header, action, value);
+        d.draw(font, header, action, value);
         graphics::output(d.dt.get_data())
     }
 
-    fn header(&mut self, header_text: &str) {
+    fn header(&mut self, font: &FontLoader, header_text: &str) {
         let mut pb = PathBuilder::new();
         //Background
         pb.rect(0., 0., 72., 72.);
@@ -170,7 +149,7 @@ impl Drawer {
 
         //Category text
         self.dt.draw_text(
-            &FONT.clone().lock().unwrap(),
+            &font.normal,
             12.,
             header_text,
             Point::new(6., 12.),
@@ -201,10 +180,10 @@ impl Drawer {
         self.dt.fill(&pb.finish(), &gradient, &DrawOptions::new());
     }
 
-    fn content(&mut self, action: &str, value: &str) {
+    fn content(&mut self, font: &FontLoader, action: &str, value: &str) {
         //Action Text
         self.dt.draw_text(
-            &FONT.clone().lock().unwrap(),
+            &font.normal,
             16.,
             action,
             Point::new(5., 39.),
@@ -214,7 +193,7 @@ impl Drawer {
 
         //Value Text
         self.dt.draw_text(
-            &BOLDFONT.clone().lock().unwrap(),
+            &font.bold,
             16.,
             value,
             Point::new(5., 63.),
