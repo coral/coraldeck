@@ -131,7 +131,7 @@ impl Controller {
         values: Arc<Mutex<HashMap<String, String>>>,
         mut trig: Receiver<bool>,
     ) {
-        let font = graphics::FontLoader::new();
+        let font = Arc::new(std::sync::Mutex::new(graphics::FontLoader::new()));
         loop {
             {
                 let btnstate = buttons.lock().await;
@@ -147,8 +147,9 @@ impl Controller {
                             None => "",
                         };
 
+                        let font = font.clone();
                         let img = Drawer::newdraw(
-                            &font,
+                            font,
                             button.color,
                             &button.module.to_uppercase(),
                             &button.action,

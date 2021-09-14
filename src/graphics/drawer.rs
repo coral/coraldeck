@@ -1,6 +1,7 @@
 use crate::graphics;
 use image::DynamicImage;
 use raqote::*;
+use std::sync::{Arc, Mutex};
 
 use super::FontLoader;
 
@@ -70,18 +71,18 @@ impl Default for Drawer {
 impl Drawer {
     pub fn draw(
         &mut self,
-        font: &FontLoader,
+        font: Arc<Mutex<FontLoader>>,
         header: &str,
         action: &str,
         value: &str,
     ) -> DynamicImage {
-        self.header(font, header);
-        self.content(font, action, value);
+        self.header(font.clone(), header);
+        self.content(font.clone(), action, value);
         graphics::output(self.dt.get_data())
     }
 
     pub fn newdraw(
-        font: &FontLoader,
+        font: Arc<Mutex<FontLoader>>,
         header_color: graphics::Color,
         header: &str,
         action: &str,
@@ -98,7 +99,7 @@ impl Drawer {
         graphics::output(d.dt.get_data())
     }
 
-    fn header(&mut self, font: &FontLoader, header_text: &str) {
+    fn header(&mut self, font: Arc<Mutex<FontLoader>>, header_text: &str) {
         let mut pb = PathBuilder::new();
         //Background
         pb.rect(0., 0., 72., 72.);
@@ -149,7 +150,7 @@ impl Drawer {
 
         //Category text
         self.dt.draw_text(
-            &font.normal,
+            &font.clone().lock().unwrap().normal,
             12.,
             header_text,
             Point::new(6., 12.),
@@ -180,10 +181,10 @@ impl Drawer {
         self.dt.fill(&pb.finish(), &gradient, &DrawOptions::new());
     }
 
-    fn content(&mut self, font: &FontLoader, action: &str, value: &str) {
+    fn content(&mut self, font: Arc<Mutex<FontLoader>>, action: &str, value: &str) {
         //Action Text
         self.dt.draw_text(
-            &font.normal,
+            &font.clone().lock().unwrap().normal,
             16.,
             action,
             Point::new(5., 39.),
@@ -193,7 +194,7 @@ impl Drawer {
 
         //Value Text
         self.dt.draw_text(
-            &font.bold,
+            &font.clone().lock().unwrap().bold,
             16.,
             value,
             Point::new(5., 63.),
