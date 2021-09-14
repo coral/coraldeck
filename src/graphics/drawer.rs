@@ -5,12 +5,12 @@ use font_kit::properties::{Properties, Weight};
 use font_kit::source::SystemSource;
 use image::DynamicImage;
 use raqote::*;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref FONT: Arc<Font> = Arc::new(
+    static ref FONT: Arc<Mutex<Font>> = Arc::new(Mutex::new(
         SystemSource::new()
             .select_best_match(
                 &[FamilyName::Title("Helvetica".into())],
@@ -19,8 +19,8 @@ lazy_static! {
             .unwrap()
             .load()
             .unwrap()
-    );
-    static ref BOLDFONT: Arc<Font> = Arc::new(
+    ));
+    static ref BOLDFONT: Arc<Mutex<Font>> = Arc::new(Mutex::new(
         SystemSource::new()
             .select_best_match(
                 &[FamilyName::Title("Helvetica".into())],
@@ -29,7 +29,7 @@ lazy_static! {
             .unwrap()
             .load()
             .unwrap()
-    );
+    ));
 }
 
 pub struct Drawer {
@@ -120,7 +120,6 @@ impl Drawer {
     }
 
     fn header(&mut self, header_text: &str) {
-        let font = FONT.clone();
         let mut pb = PathBuilder::new();
         //Background
         pb.rect(0., 0., 72., 72.);
@@ -171,7 +170,7 @@ impl Drawer {
 
         //Category text
         self.dt.draw_text(
-            &font,
+            &FONT.clone().lock().unwrap(),
             12.,
             header_text,
             Point::new(6., 12.),
@@ -203,12 +202,9 @@ impl Drawer {
     }
 
     fn content(&mut self, action: &str, value: &str) {
-        let font = FONT.clone();
-        let boldfont = BOLDFONT.clone();
-
         //Action Text
         self.dt.draw_text(
-            &font,
+            &FONT.clone().lock().unwrap(),
             16.,
             action,
             Point::new(5., 39.),
@@ -218,7 +214,7 @@ impl Drawer {
 
         //Value Text
         self.dt.draw_text(
-            &boldfont,
+            &BOLDFONT.clone().lock().unwrap(),
             16.,
             value,
             Point::new(5., 63.),
