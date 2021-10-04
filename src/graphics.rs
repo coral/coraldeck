@@ -1,11 +1,17 @@
+mod action;
 mod drawer;
 mod fontloader;
 mod startup;
 
+pub use action::Action;
 pub use drawer::Drawer;
 pub use fontloader::FontLoader;
+use raqote::DrawTarget;
 use serde::{Deserialize, Serialize};
 pub use startup::Startup;
+use tokio::runtime::Builder;
+use tokio::sync::{mpsc, mpsc::UnboundedReceiver, mpsc::UnboundedSender, oneshot};
+use tokio::task::LocalSet;
 
 use image::{DynamicImage, Rgb, RgbImage};
 
@@ -37,4 +43,57 @@ pub struct Color {
     pub r: u8,
     pub g: u8,
     pub b: u8,
+}
+
+pub struct DrawJob {
+    job: Box<dyn ButtonRenderer + Send>,
+    completion: oneshot::Sender<DynamicImage>,
+}
+
+pub struct Renderer {
+    task_queue: UnboundedSender<DrawJob>,
+}
+
+impl Renderer {
+    pub fn new() -> Renderer {
+        let rt = Builder::new_current_thread().enable_all().build().unwrap();
+
+        let (task_send, mut task_recv): (UnboundedSender<DrawJob>, UnboundedReceiver<DrawJob>) =
+            mpsc::unbounded_channel();
+
+        std::thread::spawn(move || {
+            let local = LocalSet::new();
+
+            local.spawn_local(async move {
+                let fonts = FontLoader::new();
+
+                while let Some(new_task) = task_recv.recv().await {
+                    let mut dt = DrawTarget::new(72, 72);
+                    let img = new_task.job.as_ref().render(&mut dt, &fonts);
+                    new_task.completion.send(img);
+                }
+            });
+            rt.block_on(local);
+        });
+
+        Renderer {
+            task_queue: task_send,
+        }
+    }
+
+    pub async fn draw(&self, job: Box<dyn ButtonRenderer + Send>) -> DynamicImage {
+        let (compl_tx, compl_rx) = oneshot::channel();
+
+        self.task_queue.send(DrawJob {
+            job,
+            completion: compl_tx,
+        });
+
+        let img = compl_rx.await;
+        img.unwrap()
+    }
+}
+
+pub trait ButtonRenderer {
+    fn render(&self, dt: &mut DrawTarget, fonts: &FontLoader) -> DynamicImage;
 }

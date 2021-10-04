@@ -1,5 +1,5 @@
 use crate::config::{Actions, Config};
-use crate::graphics::{self, Color, Drawer};
+use crate::graphics::{self, Action, Color, Renderer};
 use crate::modules::Module;
 use crate::StreamDeckManager;
 use log::trace;
@@ -131,7 +131,7 @@ impl Controller {
         values: Arc<Mutex<HashMap<String, String>>>,
         mut trig: Receiver<bool>,
     ) {
-        let font = Arc::new(std::sync::Mutex::new(graphics::FontLoader::new()));
+        let renderer = Renderer::new();
         loop {
             {
                 let btnstate = buttons.lock().await;
@@ -147,14 +147,14 @@ impl Controller {
                             None => "",
                         };
 
-                        let font = font.clone();
-                        let img = Drawer::newdraw(
-                            font,
+                        let job = Action::new(
                             button.color,
                             &button.module.to_uppercase(),
                             &button.action,
                             dispval,
                         );
+                        let img = renderer.draw(Box::new(job)).await;
+
                         let _ = sman.set_button_image(button.index, img).await;
                     }
                 }
