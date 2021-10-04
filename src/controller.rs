@@ -1,5 +1,5 @@
 use crate::config::{Actions, Config};
-use crate::graphics::{self, Action, Color, Renderer};
+use crate::graphics::{Action, Color, Renderer};
 use crate::modules::Module;
 use crate::StreamDeckManager;
 use log::trace;
