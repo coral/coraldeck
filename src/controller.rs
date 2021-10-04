@@ -131,7 +131,7 @@ impl Controller {
         values: Arc<Mutex<HashMap<String, String>>>,
         mut trig: Receiver<bool>,
     ) {
-        let renderer = Renderer::new();
+        let renderer = Renderer::new(72, 72);
         loop {
             {
                 let btnstate = buttons.lock().await;
@@ -153,7 +153,14 @@ impl Controller {
                             &button.action,
                             dispval,
                         );
-                        let img = renderer.draw(Box::new(job)).await;
+
+                        let img = match renderer.draw(Box::new(job)).await {
+                            Ok(img) => img,
+                            Err(e) => {
+                                error!("Render error: {}", e);
+                                continue;
+                            }
+                        };
 
                         let _ = sman.set_button_image(button.index, img).await;
                     }

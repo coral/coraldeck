@@ -1,5 +1,6 @@
 mod config;
 mod controller;
+mod error;
 mod graphics;
 mod modules;
 mod sman;

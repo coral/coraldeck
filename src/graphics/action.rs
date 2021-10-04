@@ -1,7 +1,6 @@
 use crate::graphics;
 use image::DynamicImage;
 use raqote::*;
-use std::sync::{Arc, Mutex};
 
 use super::{ButtonRenderer, FontLoader};
 
@@ -72,7 +71,7 @@ impl Default for Action {
     }
 }
 
-impl super::ButtonRenderer for Action {
+impl ButtonRenderer for Action {
     fn render(&self, dt: &mut DrawTarget, fonts: &FontLoader) -> DynamicImage {
         self.header(dt, fonts, &self.header);
         self.content(dt, fonts, &self.action, &self.value);

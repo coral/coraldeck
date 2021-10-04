@@ -3,6 +3,7 @@ mod drawer;
 mod fontloader;
 mod startup;
 
+use crate::error::Error;
 pub use action::Action;
 pub use drawer::Drawer;
 pub use fontloader::FontLoader;
@@ -47,7 +48,7 @@ pub struct Color {
 
 pub struct DrawJob {
     job: Box<dyn ButtonRenderer + Send>,
-    completion: oneshot::Sender<DynamicImage>,
+    completion: oneshot::Sender<Result<DynamicImage, Error>>,
 }
 
 pub struct Renderer {
@@ -55,7 +56,7 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn new() -> Renderer {
+    pub fn new(width: i32, height: i32) -> Renderer {
         let rt = Builder::new_current_thread().enable_all().build().unwrap();
 
         let (task_send, mut task_recv): (UnboundedSender<DrawJob>, UnboundedReceiver<DrawJob>) =
@@ -68,9 +69,9 @@ impl Renderer {
                 let fonts = FontLoader::new();
 
                 while let Some(new_task) = task_recv.recv().await {
-                    let mut dt = DrawTarget::new(72, 72);
+                    let mut dt = DrawTarget::new(width, height);
                     let img = new_task.job.as_ref().render(&mut dt, &fonts);
-                    new_task.completion.send(img);
+                    let _ = new_task.completion.send(Ok(img));
                 }
             });
             rt.block_on(local);
@@ -81,16 +82,19 @@ impl Renderer {
         }
     }
 
-    pub async fn draw(&self, job: Box<dyn ButtonRenderer + Send>) -> DynamicImage {
+    pub async fn draw(&self, job: Box<dyn ButtonRenderer + Send>) -> Result<DynamicImage, Error> {
         let (compl_tx, compl_rx) = oneshot::channel();
 
-        self.task_queue.send(DrawJob {
+        match self.task_queue.send(DrawJob {
             job,
             completion: compl_tx,
-        });
+        }) {
+            Ok(_) => {}
+            Err(_) => return Err(Error::RenderCrash),
+        }
 
         let img = compl_rx.await;
-        img.unwrap()
+        img?
     }
 }
 
