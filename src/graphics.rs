@@ -1,11 +1,9 @@
 mod action;
-mod drawer;
 mod fontloader;
 mod startup;
 
 use crate::error::Error;
 pub use action::Action;
-pub use drawer::Drawer;
 pub use fontloader::FontLoader;
 use raqote::DrawTarget;
 use serde::{Deserialize, Serialize};
