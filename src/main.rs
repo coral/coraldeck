@@ -21,8 +21,8 @@ async fn main() {
     info!("Starting CORALDECK");
     let cfg = Config::load_config("files/config.json").unwrap();
 
-    let mut sman = StreamDeckManager::new().await.unwrap();
-    let mut sgfx = graphics::Startup::new(&mut sman).await;
+    let sman = StreamDeckManager::new().await.unwrap();
+    //let mut sgfx = graphics::Startup::new(&mut sman).await;
 
     // Module init
 
@@ -35,7 +35,7 @@ async fn main() {
             module: Box::new(motu),
             color: cfg.devices.motu.color,
         });
-        sgfx.load(&mut sman, "MOTU").await;
+        //sgfx.load(&mut sman, "MOTU").await;
 
         //Keylights
         let mut lights: Vec<KeyLight> = Vec::new();
@@ -50,7 +50,7 @@ async fn main() {
             module: Box::new(kl),
             color: cfg.devices.keylight.color,
         });
-        sgfx.load(&mut sman, "KEYLIGHT").await;
+        //sgfx.load(&mut sman, "KEYLIGHT").await;
 
         //Camera
         let cam = Camera::new(&cfg.devices.camera.name).await.unwrap();
@@ -58,7 +58,7 @@ async fn main() {
             module: Box::new(cam),
             color: cfg.devices.camera.color,
         });
-        sgfx.load(&mut sman, "CAMERA").await;
+        //sgfx.load(&mut sman, "CAMERA").await;
     }
     // Controller
 

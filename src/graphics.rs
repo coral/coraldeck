@@ -66,10 +66,15 @@ impl Renderer {
             local.spawn_local(async move {
                 let fonts = FontLoader::new();
 
-                while let Some(new_task) = task_recv.recv().await {
-                    let mut dt = DrawTarget::new(width, height);
-                    let img = new_task.job.as_ref().render(&mut dt, &fonts);
-                    let _ = new_task.completion.send(Ok(img));
+                loop {
+                    match task_recv.recv().await {
+                        Some(new_task) => {
+                            let mut dt = DrawTarget::new(width, height);
+                            let img = new_task.job.as_ref().render(&mut dt, &fonts);
+                            let _ = new_task.completion.send(Ok(img));
+                        }
+                        None => return,
+                    }
                 }
             });
             rt.block_on(local);
