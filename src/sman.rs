@@ -81,6 +81,10 @@ impl StreamDeckManager {
         self.device.lock().await.reset()
     }
 
+    pub async fn brightness(&mut self, brightness: u8) -> Result<(), streamdeck::Error> {
+        self.device.lock().await.set_brightness(brightness)
+    }
+
     async fn poll(device: Arc<Mutex<StreamDeck>>, chan: Arc<Mutex<Sender<ButtonPress>>>) {
         let mut interval = time::interval(Duration::from_millis(1));
 

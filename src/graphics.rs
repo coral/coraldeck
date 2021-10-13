@@ -1,9 +1,11 @@
 mod action;
+mod boot;
 mod fontloader;
 mod startup;
 
 use crate::error::Error;
 pub use action::Action;
+pub use boot::Boot;
 pub use fontloader::FontLoader;
 use raqote::DrawTarget;
 use serde::{Deserialize, Serialize};
@@ -49,8 +51,10 @@ pub struct DrawJob {
     completion: oneshot::Sender<Result<DynamicImage, Error>>,
 }
 
+#[derive(Clone)]
 pub struct Renderer {
     task_queue: UnboundedSender<DrawJob>,
+    // cancel: oneshot::Sender<bool>,
 }
 
 impl Renderer {
@@ -59,6 +63,8 @@ impl Renderer {
 
         let (task_send, mut task_recv): (UnboundedSender<DrawJob>, UnboundedReceiver<DrawJob>) =
             mpsc::unbounded_channel();
+
+        //let (cancel_send, cancel_recv) = oneshot::channel();
 
         std::thread::spawn(move || {
             let local = LocalSet::new();
@@ -82,6 +88,7 @@ impl Renderer {
 
         Renderer {
             task_queue: task_send,
+            //cancel: cancel_send,
         }
     }
 
