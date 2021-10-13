@@ -7,7 +7,7 @@ mod sman;
 
 use config::Config;
 use controller::{Controller, ModuleConfig};
-use modules::{Camera, KeyLight, KeyLights, Module, MOTU};
+use modules::{Camera, KeyLight, KeyLights, MOTU};
 use sman::StreamDeckManager;
 use std::time::Duration;
 

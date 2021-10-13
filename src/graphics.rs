@@ -1,7 +1,6 @@
 mod action;
 mod boot;
 mod fontloader;
-mod startup;
 
 use crate::error::Error;
 pub use action::Action;
@@ -9,7 +8,6 @@ pub use boot::Boot;
 pub use fontloader::FontLoader;
 use raqote::DrawTarget;
 use serde::{Deserialize, Serialize};
-pub use startup::Startup;
 use tokio::runtime::Builder;
 use tokio::sync::{mpsc, mpsc::UnboundedReceiver, mpsc::UnboundedSender, oneshot};
 use tokio::task::LocalSet;
