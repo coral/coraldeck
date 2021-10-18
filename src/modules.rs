@@ -1,11 +1,24 @@
-//include!(concat!(env!("OUT_DIR"), "/modimports.rs"));
+pub mod motu;
+
+pub mod keylight;
+
+pub mod camera;
 
 pub use crate::error::Error;
+use std::future::Future;
 use tokio::sync::mpsc::Receiver;
 
 use async_trait::async_trait;
 
-inventory::collect!(Box<dyn Module + Send>);
+pub struct Definiton {
+    pub name: &'static str,
+    //Box<dyn Future<Output = Result<Box<dyn Module + Send>, Error>>>
+    //pub instansiate: Box<dyn Fn() -> Result<Box<dyn Module + Send>, Error>>,
+    pub instansiate:
+        Box<dyn Fn() -> Box<dyn Future<Output = Result<Box<dyn Module + Send>, Error>>>>,
+}
+
+inventory::collect!(Definiton);
 
 #[async_trait]
 pub trait Module {

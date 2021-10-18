@@ -22,6 +22,12 @@ async fn main() {
 
     let mut sman = StreamDeckManager::new().await.unwrap();
 
+    for flag in inventory::iter::<modules::Definiton> {
+        println!("{}", flag.name);
+        let m = &(flag.instansiate)().await;
+        // m.
+    }
+
     // Module init
     // let mut m: Vec<ModuleConfig> = Vec::new();
     // {

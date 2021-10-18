@@ -12,6 +12,8 @@ use std::time::Duration;
 use tokio::sync::broadcast::error::RecvError;
 use tokio::sync::mpsc::{self, Receiver};
 
+use super::Definiton;
+
 lazy_static! {
     static ref ISO: Vec<i32> = vec![
         100, 125, 160, 200, 250, 320, 400, 500, 640, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000,
@@ -23,7 +25,25 @@ pub struct Camera {
     cam: BluetoothCamera,
 }
 
+inventory::submit! {
+    super::Definiton  {
+        name: "camera",
+        instansiate: Box::new(|| Box::new(Camera::instantiate() )),
+    }
+}
+
 impl Camera {
+    pub async fn instantiate() -> Result<Box<dyn Module + Send>, Error> {
+        let mut cam = BluetoothCamera::new("hello")
+            .await
+            .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
+        cam.connect(Duration::from_secs(10))
+            .await
+            .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
+
+        Ok(Box::new(Camera { cam }))
+    }
+
     pub async fn new(cam: &str) -> Result<Camera, BluetoothCameraError> {
         let mut cam = BluetoothCamera::new(cam).await?;
         cam.connect(Duration::from_secs(10)).await?;
@@ -36,13 +56,6 @@ impl Camera {
 impl Module for Camera {
     fn name(&self) -> String {
         return S("camera");
-    }
-
-    async fn instantiate() -> Result<Self, Error> {
-        let mut cam = BluetoothCamera::new(cam).await?;
-        cam.connect(Duration::from_secs(10)).await?;
-
-        Ok(Camera { cam })
     }
 
     async fn trigger(&mut self, action: &str) -> Option<String> {
