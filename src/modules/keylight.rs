@@ -124,3 +124,5 @@ impl Module for KeyLight {
         rx
     }
 }
+
+pub async fn instantiate() -> Result<super::DynModule, super::Error> { unimplemented!() }

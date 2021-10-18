@@ -198,3 +198,5 @@ impl Module for MOTU {
         rx
     }
 }
+
+pub async fn instantiate() -> Result<super::DynModule, super::Error> { unimplemented!() }
