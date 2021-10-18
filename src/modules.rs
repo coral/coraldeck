@@ -1,13 +1,11 @@
-pub mod camera;
-pub mod keylight;
-pub mod motu;
+//include!(concat!(env!("OUT_DIR"), "/modimports.rs"));
 
-pub use camera::Camera;
-pub use keylight::{KeyLight, KeyLights};
-pub use motu::MOTU;
+pub use crate::error::Error;
 use tokio::sync::mpsc::Receiver;
 
 use async_trait::async_trait;
+
+inventory::collect!(Box<dyn Module + Send>);
 
 #[async_trait]
 pub trait Module {

@@ -11,6 +11,9 @@ pub enum Error {
     #[error(transparent)]
     ChannelError(#[from] tokio::sync::oneshot::error::RecvError),
 
+    #[error("The module `{0}` failed to init: `{1}`")]
+    ModuleInit(String, String),
+
     #[error("Renderer crashed")]
     RenderCrash,
 }

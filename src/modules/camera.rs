@@ -5,6 +5,7 @@ use blackmagic_camera_control::command::{Command, Video};
 pub use blackmagic_camera_control::BluetoothCamera;
 use blackmagic_camera_control::Operation;
 
+use crate::error::Error;
 use blackmagic_camera_control::error::BluetoothCameraError;
 use lazy_static::lazy_static;
 use std::time::Duration;
@@ -35,6 +36,13 @@ impl Camera {
 impl Module for Camera {
     fn name(&self) -> String {
         return S("camera");
+    }
+
+    async fn instantiate() -> Result<Self, Error> {
+        let mut cam = BluetoothCamera::new(cam).await?;
+        cam.connect(Duration::from_secs(10)).await?;
+
+        Ok(Camera { cam })
     }
 
     async fn trigger(&mut self, action: &str) -> Option<String> {
