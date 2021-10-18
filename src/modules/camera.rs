@@ -14,7 +14,7 @@ use std::pin::Pin;
 use tokio::sync::broadcast::error::RecvError;
 use tokio::sync::mpsc::{self, Receiver};
 
-use super::{Definiton, DynModuleFuture};
+use super::{Definiton, DynModule};
 
 lazy_static! {
     static ref ISO: Vec<i32> = vec![
@@ -30,24 +30,20 @@ pub struct Camera {
 inventory::submit! {
     super::Definiton  {
         name: "camera",
-        instantiate: Camera::instantiate,
+        instantiate: || Box::pin(Camera::instantiate()),
     }
 }
 
 impl Camera {
-    pub fn instantiate() -> DynModuleFuture {
-        let future = async {
-            let mut cam = BluetoothCamera::new("hello")
-                .await
-                .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
-            cam.connect(Duration::from_secs(10))
-                .await
-                .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
-            let camera: Box<dyn Module+Send> = Box::new(Camera { cam });
-            Ok(camera)
-        };
+    pub async fn instantiate() -> Result<DynModule, Error> {
+        let mut cam = BluetoothCamera::new("hello")
+            .await
+            .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
+        cam.connect(Duration::from_secs(10))
+            .await
+            .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
 
-        Box::pin(future)
+        Ok(Box::new(Camera { cam } ))
     }
 
     pub async fn new(cam: &str) -> Result<Camera, BluetoothCameraError> {
