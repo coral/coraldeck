@@ -10,9 +10,11 @@ fn main() {
     let mut scope = Scope::new();
 
     for path in paths {
+        let path = path.unwrap().path();
+        let name = path.file_stem().unwrap().to_string_lossy();
         scope.raw(&format!(
-            "pub mod {};",
-            path.unwrap().path().file_stem().unwrap().to_string_lossy()
+            "#[path = \"../../../../../src/modules/{}.rs\"] mod {};",
+            name, name
         ));
     }
     let output = scope.to_string();

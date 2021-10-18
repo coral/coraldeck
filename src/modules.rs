@@ -1,9 +1,4 @@
-pub mod motu;
-
-pub mod keylight;
-
-pub mod camera;
-
+include!(concat!(env!("OUT_DIR"), "/modimports.rs"));
 pub use crate::error::Error;
 use std::future::Future;
 use tokio::sync::mpsc::Receiver;
