@@ -24,7 +24,7 @@ async fn main() {
 
     for flag in inventory::iter::<modules::Definiton> {
         println!("{}", flag.name);
-        let m = &(flag.instansiate)().await;
+        let m = (flag.instantiate)().await;
         // m.
     }
 
