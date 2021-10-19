@@ -9,12 +9,8 @@ use crate::error::Error;
 use blackmagic_camera_control::error::BluetoothCameraError;
 use lazy_static::lazy_static;
 use std::time::Duration;
-use std::future::Future;
-use std::pin::Pin;
 use tokio::sync::broadcast::error::RecvError;
 use tokio::sync::mpsc::{self, Receiver};
-
-use super::{Definiton, DynModule};
 
 lazy_static! {
     static ref ISO: Vec<i32> = vec![
@@ -27,15 +23,8 @@ pub struct Camera {
     cam: BluetoothCamera,
 }
 
-inventory::submit! {
-    super::Definiton  {
-        name: "camera",
-        instantiate: || Box::pin(Camera::instantiate()),
-    }
-}
-
 impl Camera {
-    pub async fn instantiate() -> Result<DynModule, Error> {
+    pub async fn instantiate() -> Result<Camera, Error> {
         let mut cam = BluetoothCamera::new("hello")
             .await
             .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
@@ -43,7 +32,7 @@ impl Camera {
             .await
             .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
 
-        Ok(Box::new(Camera { cam } ))
+        Ok(Camera { cam })
     }
 
     pub async fn new(cam: &str) -> Result<Camera, BluetoothCameraError> {
@@ -162,4 +151,8 @@ async fn wb(cam: &mut BluetoothCamera, diff: i16) -> Option<String> {
         }
         None => None,
     }
+}
+
+pub async fn instantiate() -> Result<super::DynModule, Error> {
+    Ok(Box::new(Camera::instantiate().await?))
 }

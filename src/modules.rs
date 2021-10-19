@@ -14,8 +14,6 @@ pub struct Definiton {
     pub instantiate: fn() -> DynModuleFuture,
 }
 
-inventory::collect!(Definiton);
-
 #[async_trait]
 pub trait Module {
     fn name(&self) -> String;

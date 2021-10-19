@@ -22,10 +22,9 @@ async fn main() {
 
     let mut sman = StreamDeckManager::new().await.unwrap();
 
-    for flag in inventory::iter::<modules::Definiton> {
-        println!("{}", flag.name);
-        let m = (flag.instantiate)().await;
-        // m.
+    let modules = modules::instantiate_all().await.unwrap();
+    for (name, _) in &modules {
+        println!("{}", name);
     }
 
     // Module init
