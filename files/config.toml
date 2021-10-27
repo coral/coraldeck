@@ -1,0 +1,7 @@
+[modules]
+    [modules.keylight]
+        names = ["Key Light Left", "Key Light Right"]
+    [modules.motu]
+        ip = "10.0.1.5"
+    [modules.camera]
+        name = "A:4BE2529F"

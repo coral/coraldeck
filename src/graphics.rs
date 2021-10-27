@@ -52,7 +52,6 @@ pub struct DrawJob {
 #[derive(Clone)]
 pub struct Renderer {
     task_queue: UnboundedSender<DrawJob>,
-    // cancel: oneshot::Sender<bool>,
 }
 
 impl Renderer {
@@ -61,8 +60,6 @@ impl Renderer {
 
         let (task_send, mut task_recv): (UnboundedSender<DrawJob>, UnboundedReceiver<DrawJob>) =
             mpsc::unbounded_channel();
-
-        //let (cancel_send, cancel_recv) = oneshot::channel();
 
         std::thread::spawn(move || {
             let local = LocalSet::new();
@@ -86,7 +83,6 @@ impl Renderer {
 
         Renderer {
             task_queue: task_send,
-            //cancel: cancel_send,
         }
     }
 

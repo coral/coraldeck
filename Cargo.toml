@@ -25,6 +25,8 @@ futures = "0.3.17"
 lazy_static = "1.4.0"
 big_s = "1.0.2"
 blackmagic-camera-control = "0.2.1"
+toml = "0.5.8"
+for_each_mod = { git = "https://github.com/ben0x539/for_each_mod.git"}
 
 [build-dependencies]
 codegen = "0.1.3"

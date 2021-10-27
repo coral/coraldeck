@@ -21,6 +21,10 @@ pub enum MOTUError {
     RequestError(#[from] reqwest::Error),
 }
 
+pub struct MOTU_Config {
+    pub ip: Ipv4Addr,
+}
+
 #[allow(dead_code)]
 pub struct MOTU {
     addr: Ipv4Addr,
@@ -199,4 +203,6 @@ impl Module for MOTU {
     }
 }
 
-pub async fn instantiate() -> Result<super::DynModule, super::Error> { unimplemented!() }
+pub async fn instantiate() -> Result<super::DynModule, super::Error> {
+    unimplemented!()
+}

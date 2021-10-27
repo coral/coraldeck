@@ -16,4 +16,7 @@ pub enum Error {
 
     #[error("Renderer crashed")]
     RenderCrash,
+
+    #[error("Module `{0}` not found")]
+    ModuleNotFound(String),
 }

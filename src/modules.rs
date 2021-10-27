@@ -6,8 +6,8 @@ use tokio::sync::mpsc::Receiver;
 
 use async_trait::async_trait;
 
-type DynModule = Box<dyn Module+Send>;
-type DynModuleFuture = Pin<Box<dyn Future<Output=Result<DynModule, Error>>>>;
+type DynModule = Box<dyn Module + Send>;
+type DynModuleFuture = Pin<Box<dyn Future<Output = Result<DynModule, Error>>>>;
 
 pub struct Definiton {
     pub name: &'static str,

@@ -68,6 +68,12 @@ async fn main() {
 
     let mut m: Vec<ModuleConfig> = Vec::new();
 
+    let mut motu = modules::instantiate("motu").await.unwrap();
+    m.push(ModuleConfig {
+        module: motu,
+        color: graphics::Color { r: 0, g: 255, b: 1 },
+    });
+
     // Controller
 
     let mut ctrl = Controller::new(cfg, sman, m).await;
