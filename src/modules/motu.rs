@@ -23,14 +23,14 @@ pub enum MOTUError {
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct MOTU_Config {
+pub struct MOTUConfig {
     pub ip: Ipv4Addr,
     pub color: Vec<u8>,
 }
 
 #[allow(dead_code)]
 pub struct MOTU {
-    config: MOTU_Config,
+    config: MOTUConfig,
     client_id: u32,
     url: String,
 
@@ -42,7 +42,7 @@ pub struct MOTU {
 }
 
 impl MOTU {
-    pub async fn new(cfg: MOTU_Config) -> MOTU {
+    pub async fn new(cfg: MOTUConfig) -> MOTU {
         let mut rng = rand::thread_rng();
         let client_id = rng.gen::<u32>();
 
@@ -219,7 +219,7 @@ impl Module for MOTU {
 }
 
 pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Error> {
-    let config: MOTU_Config = cfg.try_into()?;
+    let config: MOTUConfig = cfg.try_into()?;
 
     Ok(Box::new(MOTU::new(config).await))
 }

@@ -26,9 +26,9 @@ async fn main() -> Result<(), error::Error> {
         Ok(sman) => sman,
         Err(e) => {
             return Err(match e {
-                streamdeck::Error::Hid(HidError) => Error::StreamdeckError(format!(
+                streamdeck::Error::Hid(hid_error) => Error::StreamdeckError(format!(
                     "Could not connect to the streamdeck: {}",
-                    HidError.to_string()
+                    hid_error.to_string()
                 )),
                 _ => Error::StreamdeckError("Unknown Error".to_string()),
             })

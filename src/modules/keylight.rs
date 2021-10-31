@@ -3,14 +3,13 @@ use async_trait::async_trait;
 use big_s::S;
 pub use elgato_keylight::KeyLight;
 use serde::Deserialize;
-use tokio::sync::mpsc::Sender;
 use std::time::Duration;
+use tokio::sync::mpsc::Sender;
 
 #[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Keylights_Config {
+pub struct KeylightsConfig {
     pub names: Vec<String>,
 }
-
 
 pub struct KeyLights {
     lights: Vec<KeyLight>,
@@ -133,9 +132,8 @@ impl Module for KeyLight {
     }
 }
 
-
 pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Error> {
-    let config: Keylights_Config = cfg.try_into()?;
+    let config: KeylightsConfig = cfg.try_into()?;
 
     let mut lights: Vec<KeyLight> = Vec::new();
     for l in config.names {
@@ -144,7 +142,6 @@ pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Er
             .unwrap();
         lights.push(key);
     }
-
 
     Ok(Box::new(KeyLights::new(lights).await))
 }
