@@ -172,7 +172,10 @@ impl Controller {
         let mut events = self.sman.subscribe().await;
 
         loop {
-            let event = events.recv().await.unwrap();
+            let event = match events.recv().await {
+                Ok(event) => event,
+                Err(e) => continue,
+            };
 
             let act = match self.index.get(&event.num) {
                 Some(v) => v,

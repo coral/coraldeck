@@ -9,7 +9,6 @@ use config::Config;
 use controller::Controller;
 use error::Error;
 use sman::StreamDeckManager;
-use std::time::Duration;
 
 extern crate pretty_env_logger;
 #[macro_use]
@@ -23,12 +22,12 @@ async fn main() -> Result<(), error::Error> {
     let cfg = Config::load_config("files/config.toml")?;
 
     //Streamdeck handling
-    let mut sman = match StreamDeckManager::new().await {
+    let mut sman = match StreamDeckManager::new(cfg.clone().streamdeck).await {
         Ok(sman) => sman,
         Err(e) => {
             return Err(match e {
                 streamdeck::Error::Hid(HidError) => Error::StreamdeckError(format!(
-                    "Could not connec to the streamdeck: {}",
+                    "Could not connect to the streamdeck: {}",
                     HidError.to_string()
                 )),
                 _ => Error::StreamdeckError("Unknown Error".to_string()),
@@ -50,7 +49,7 @@ async fn main() -> Result<(), error::Error> {
         }
     }
 
-    sman.reset().await;
+    let _ = sman.reset().await;
 
     let mut ctrl = Controller::new(cfg.clone(), sman, loaded_modules).await;
 

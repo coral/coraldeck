@@ -1,9 +1,12 @@
+[streamdeck]
+    brightness = 30
+
 [modules]
-    #[modules.keylight]
-    #    names = ["Key Light Left", "Key Light Right"]
+    [modules.keylight]
+        names = ["Key Light Left", "Key Light Right"]
     [modules.motu]
         ip = "10.0.1.5"
-        color = [255, 80, 0]
+        color = [255, 0, 255]
     #[modules.camera]
     #    name = "A:4BE2529F"
     #[modules.other]
@@ -26,3 +29,33 @@
     desc = "VOL -"
     value = "volume"
     display = "volume"
+
+[[action]]
+    btn = 3
+    module = "keylight"
+    action = "left_light_up"
+    desc = "LEFT +"
+    value = "left_intensity"
+    display = "left_intensity"
+
+[[action]]
+    btn = 8
+    module = "keylight"
+    action = "left_light_down"
+    desc = "LEFT -"
+    value = "left_intensity"
+
+[[action]]
+    btn = 4
+    module = "keylight"
+    action = "right_light_up"
+    desc = "RIGHT +"
+    value = "right_intensity"
+    display = "right_intensity"
+
+[[action]]
+    btn = 9
+    module = "keylight"
+    action = "right_light_down"
+    desc = "RIGHT -"
+    value = "right_intensity"

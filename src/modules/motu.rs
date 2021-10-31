@@ -25,6 +25,7 @@ pub enum MOTUError {
 #[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MOTU_Config {
     pub ip: Ipv4Addr,
+    pub color: Vec<u8>,
 }
 
 #[allow(dead_code)]
@@ -206,6 +207,14 @@ impl Module for MOTU {
         });
 
         rx
+    }
+
+    fn color(&self) -> (u8, u8, u8) {
+        return (
+            self.config.color[0],
+            self.config.color[1],
+            self.config.color[2],
+        );
     }
 }
 

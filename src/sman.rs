@@ -1,3 +1,4 @@
+use crate::config::StreamdeckConfig;
 use image::DynamicImage;
 use log::error;
 use std::sync::Arc;
@@ -46,9 +47,9 @@ impl Default for ButtonState {
 }
 
 impl StreamDeckManager {
-    pub async fn new() -> Result<StreamDeckManager, streamdeck::Error> {
+    pub async fn new(cfg: StreamdeckConfig) -> Result<StreamDeckManager, streamdeck::Error> {
         let mut m = StreamDeck::connect(0x0fd9, 0x0060, None)?;
-        m.set_brightness(30)?;
+        m.set_brightness(cfg.brightness)?;
         m.set_blocking(false)?;
         let m = Arc::new(Mutex::new(m));
 

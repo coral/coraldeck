@@ -2,7 +2,15 @@ use crate::modules::Module;
 use async_trait::async_trait;
 use big_s::S;
 pub use elgato_keylight::KeyLight;
+use serde::Deserialize;
 use tokio::sync::mpsc::Sender;
+use std::time::Duration;
+
+#[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Keylights_Config {
+    pub names: Vec<String>,
+}
+
 
 pub struct KeyLights {
     lights: Vec<KeyLight>,
@@ -125,4 +133,18 @@ impl Module for KeyLight {
     }
 }
 
-pub async fn instantiate() -> Result<super::DynModule, super::Error> { unimplemented!() }
+
+pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Error> {
+    let config: Keylights_Config = cfg.try_into()?;
+
+    let mut lights: Vec<KeyLight> = Vec::new();
+    for l in config.names {
+        let key = KeyLight::new_from_name(&l, Some(Duration::from_secs(5)))
+            .await
+            .unwrap();
+        lights.push(key);
+    }
+
+
+    Ok(Box::new(KeyLights::new(lights).await))
+}

@@ -7,8 +7,15 @@ use std::sync::Arc;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
+    pub streamdeck: StreamdeckConfig,
     pub modules: BTreeMap<String, toml::Value>,
     pub action: Vec<Action>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Copy)]
+#[serde(rename_all = "camelCase")]
+pub struct StreamdeckConfig {
+    pub brightness: u8,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
