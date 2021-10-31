@@ -19,7 +19,7 @@ async fn main() {
     pretty_env_logger::init();
     info!("Starting CORALDECK");
 
-    let m = modules::instantiate_by_name("motu").await.unwrap();
+    //let m = modules::instantiate_by_name("motu").await.unwrap();
 
     let cfg = Config::load_config("files/config.json").unwrap();
 

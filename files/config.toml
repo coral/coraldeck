@@ -1,9 +1,10 @@
 [modules]
-    [modules.keylight]
-        names = ["Key Light Left", "Key Light Right"]
+    #[modules.keylight]
+    #    names = ["Key Light Left", "Key Light Right"]
     [modules.motu]
         ip = "10.0.1.5"
-    [modules.camera]
-        name = "A:4BE2529F"
-    [modules.other]
-        something = "I AM TYPING SOMETHING THIS IS A STRING"
+        color = [255, 80, 0]
+    #[modules.camera]
+    #    name = "A:4BE2529F"
+    #[modules.other]
+    #    something = "I AM TYPING SOMETHING THIS IS A STRING"

@@ -1,6 +1,5 @@
 //include!(concat!(env!("OUT_DIR"), "/modimports.rs"));
 pub use crate::error::Error;
-use for_each_mod::*;
 
 use std::future::Future;
 use std::pin::Pin;
@@ -11,19 +10,18 @@ use async_trait::async_trait;
 type DynModule = Box<dyn Module + Send>;
 type DynModuleFuture = Pin<Box<dyn Future<Output = Result<DynModule, Error>>>>;
 
-for_each_mod! {
-    #[path = "modules/PLACEHOLDER.rs"]
-    mod PLACEHOLDER;
-}
+automod::dir!("src/modules");
 
-pub async fn instantiate_by_name(name: &str) -> Result<DynModule, Error> {
-    for_each_mod! { if "PLACEHOLDER" == name { return PLACEHOLDER::instantiate().await; } };
+pub async fn instantiate_by_name(name: &str, config: toml::Value) -> Result<DynModule, Error> {
+    automod::with_mods!("src/modules" PLACEHOLDER => if stringify!(PLACEHOLDER) == name {
+        return PLACEHOLDER::instantiate().await
+    });
     panic!()
 }
 
 pub struct Definiton {
     pub name: &'static str,
-    pub instantiate: fn() -> DynModuleFuture,
+    pub instantiate: fn(cfg: toml::Value) -> DynModuleFuture,
 }
 
 #[async_trait]

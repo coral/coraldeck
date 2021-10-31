@@ -203,7 +203,7 @@ impl Module for MOTU {
     }
 }
 
-pub async fn instantiate() -> Result<super::DynModule, super::Error> {
+pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Error> {
     println!("THIS IS ACTUALLY IMPLEMENTED PSYCHE");
     return Err(crate::error::Error::RenderCrash);
 }
