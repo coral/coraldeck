@@ -1,5 +1,5 @@
-use crate::config::{Actions, Config};
-use crate::graphics::{Action, Color, Renderer};
+use crate::config::{Action, Config};
+use crate::graphics::{Button as VisualButton, Color, Renderer};
 use crate::modules::Module;
 use crate::StreamDeckManager;
 use log::trace;
@@ -12,7 +12,7 @@ pub struct Controller {
     cfg: Arc<Config>,
     sman: StreamDeckManager,
 
-    index: HashMap<u8, Actions>,
+    index: HashMap<u8, Action>,
     modules: HashMap<String, Box<dyn Module + Send>>,
 
     buttons: Arc<Mutex<Vec<Button>>>,
@@ -28,16 +28,11 @@ pub struct Button {
     display: Option<String>,
 }
 
-pub struct ModuleConfig {
-    pub module: Box<dyn Module + Send>,
-    pub color: Color,
-}
-
 impl Controller {
     pub async fn new(
         cfg: Arc<Config>,
         sman: StreamDeckManager,
-        modules: Vec<ModuleConfig>,
+        modules: Vec<Box<dyn Module + Send>>,
     ) -> Controller {
         let (rend_tx, rend_rx) = mpsc::channel(32);
 
@@ -65,18 +60,21 @@ impl Controller {
         ctrl
     }
 
-    async fn setup(&mut self, modules: Vec<ModuleConfig>) {
+    async fn setup(&mut self, modules: Vec<Box<dyn Module + Send>>) {
         let _ = self.sman.reset().await;
 
         //Setup routing
-        for action in &self.cfg.actions {
+        for action in &self.cfg.action {
             self.index.insert(action.btn, action.clone());
         }
 
         let mut sb = self.buttons.lock().await;
-        for action in &self.cfg.actions {
-            let color = match modules.iter().find(|&x| x.module.name() == action.module) {
-                Some(v) => v.color,
+        for action in &self.cfg.action {
+            let color = match modules.iter().find(|&x| x.name() == action.module) {
+                Some(v) => {
+                    let (r, g, b) = v.color();
+                    Color { r, g, b }
+                }
                 None => Color {
                     r: 100,
                     g: 100,
@@ -99,10 +97,10 @@ impl Controller {
         //Setup modules
         let mut min: HashMap<String, Box<dyn Module + Send>> = HashMap::new();
         for mut mc in modules.into_iter() {
-            let name = mc.module.name();
+            let name = mc.name();
 
             //Hook up value updates
-            let mut updates = mc.module.subscribe().await;
+            let mut updates = mc.subscribe().await;
             let db = self.values.clone();
             let rendtrig = self.rendtrig.clone();
             tokio::spawn(async move {
@@ -119,7 +117,7 @@ impl Controller {
                 }
             });
 
-            min.insert(name, mc.module);
+            min.insert(name, mc);
         }
 
         self.modules = min;
@@ -147,7 +145,7 @@ impl Controller {
                             None => "",
                         };
 
-                        let job = Action::new(
+                        let job = VisualButton::new(
                             button.color,
                             &button.module.to_uppercase(),
                             &button.action,

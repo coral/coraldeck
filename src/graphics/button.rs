@@ -4,7 +4,7 @@ use raqote::*;
 
 use super::{ButtonRenderer, FontLoader};
 
-pub struct Action {
+pub struct Button {
     bg: SolidSource,
     text_bg: SolidSource,
     border_accent: SolidSource,
@@ -19,7 +19,7 @@ pub struct Action {
     value: String,
 }
 
-impl Default for Action {
+impl Default for Button {
     fn default() -> Self {
         Self {
             bg: SolidSource {
@@ -71,7 +71,7 @@ impl Default for Action {
     }
 }
 
-impl ButtonRenderer for Action {
+impl ButtonRenderer for Button {
     fn render(&self, dt: &mut DrawTarget, fonts: &FontLoader) -> DynamicImage {
         self.header(dt, fonts, &self.header);
         self.content(dt, fonts, &self.action, &self.value);
@@ -80,9 +80,9 @@ impl ButtonRenderer for Action {
     }
 }
 
-impl Action {
-    pub fn new(header_color: graphics::Color, header: &str, action: &str, value: &str) -> Action {
-        let mut d = Action::default();
+impl Button {
+    pub fn new(header_color: graphics::Color, header: &str, action: &str, value: &str) -> Button {
+        let mut d = Button::default();
         d.border_accent = SolidSource {
             r: header_color.r,
             g: header_color.g,
@@ -174,7 +174,7 @@ impl Action {
     }
 
     fn content(&self, dt: &mut DrawTarget, font: &FontLoader, action: &str, value: &str) {
-        //Action Text
+        //Button Text
         dt.draw_text(
             &font.normal,
             16.,

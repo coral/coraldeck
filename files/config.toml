@@ -8,3 +8,21 @@
     #    name = "A:4BE2529F"
     #[modules.other]
     #    something = "I AM TYPING SOMETHING THIS IS A STRING"
+
+
+##Defined Actions
+[[action]]
+    btn = 0
+    module = "motu"
+    action = "vol_up"
+    desc = "VOL +"
+    value = "volume"
+    display = "volume"
+
+[[action]]
+    btn = 5
+    module = "motu"
+    action = "vol_down"
+    desc = "VOL -"
+    value = "volume"
+    display = "volume"

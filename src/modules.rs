@@ -7,14 +7,14 @@ use tokio::sync::mpsc::Receiver;
 
 use async_trait::async_trait;
 
-type DynModule = Box<dyn Module + Send>;
+pub type DynModule = Box<dyn Module + Send>;
 type DynModuleFuture = Pin<Box<dyn Future<Output = Result<DynModule, Error>>>>;
 
 automod::dir!("src/modules");
 
 pub async fn instantiate_by_name(name: &str, config: toml::Value) -> Result<DynModule, Error> {
     automod::with_mods!("src/modules" PLACEHOLDER => if stringify!(PLACEHOLDER) == name {
-        return PLACEHOLDER::instantiate().await
+        return PLACEHOLDER::instantiate(config).await
     });
     panic!()
 }
@@ -31,4 +31,8 @@ pub trait Module {
     async fn trigger(&mut self, action: &str) -> Option<String>;
 
     async fn subscribe(&mut self) -> Receiver<(String, String)>;
+
+    fn color(&self) -> (u8, u8, u8) {
+        return (230, 100, 20);
+    }
 }

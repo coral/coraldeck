@@ -6,6 +6,9 @@ pub enum Error {
     ParseError(#[from] serde_json::Error),
 
     #[error(transparent)]
+    ConfigError(#[from] toml::de::Error),
+
+    #[error(transparent)]
     ReadError(#[from] std::io::Error),
 
     #[error(transparent)]

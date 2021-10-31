@@ -1,10 +1,10 @@
-mod action;
 mod boot;
+mod button;
 mod fontloader;
 
 use crate::error::Error;
-pub use action::Action;
 pub use boot::Boot;
+pub use button::Button;
 pub use fontloader::FontLoader;
 use raqote::DrawTarget;
 use serde::{Deserialize, Serialize};

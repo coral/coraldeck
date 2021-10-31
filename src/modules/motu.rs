@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use big_s::S;
 use log::error;
 use rand::Rng;
+use serde::Deserialize;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::fmt::Display;
@@ -21,13 +22,14 @@ pub enum MOTUError {
     RequestError(#[from] reqwest::Error),
 }
 
+#[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MOTU_Config {
     pub ip: Ipv4Addr,
 }
 
 #[allow(dead_code)]
 pub struct MOTU {
-    addr: Ipv4Addr,
+    config: MOTU_Config,
     client_id: u32,
     url: String,
 
@@ -39,15 +41,15 @@ pub struct MOTU {
 }
 
 impl MOTU {
-    pub fn new(addr: Ipv4Addr) -> MOTU {
+    pub async fn new(cfg: MOTU_Config) -> MOTU {
         let mut rng = rand::thread_rng();
         let client_id = rng.gen::<u32>();
 
         //TODO: Resolve difference with client_id
-        let url = format!("http://{}/datastore", addr.to_string());
+        let url = format!("http://{}/datastore", cfg.ip.to_string());
 
-        MOTU {
-            addr,
+        let mut m = MOTU {
+            config: cfg,
             client_id,
             url,
 
@@ -56,7 +58,11 @@ impl MOTU {
 
             last_headphone_vol: 0.0,
             rendtrig: None,
-        }
+        };
+
+        m.connect().await;
+
+        m
     }
 
     pub async fn connect(&mut self) -> Result<(), MOTUError> {
@@ -204,6 +210,7 @@ impl Module for MOTU {
 }
 
 pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Error> {
-    println!("THIS IS ACTUALLY IMPLEMENTED PSYCHE");
-    return Err(crate::error::Error::RenderCrash);
+    let config: MOTU_Config = cfg.try_into()?;
+
+    Ok(Box::new(MOTU::new(config).await))
 }
