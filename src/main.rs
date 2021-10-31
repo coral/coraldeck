@@ -7,6 +7,7 @@ mod sman;
 
 use config::Config;
 use controller::Controller;
+use error::Error;
 use sman::StreamDeckManager;
 use std::time::Duration;
 
@@ -19,9 +20,22 @@ async fn main() -> Result<(), error::Error> {
     pretty_env_logger::init();
     info!("Starting CORALDECK");
 
-    let cfg = Config::load_config("files/config.toml").unwrap();
+    let cfg = Config::load_config("files/config.toml")?;
 
-    let mut sman = StreamDeckManager::new().await.unwrap();
+    //Streamdeck handling
+    let mut sman = match StreamDeckManager::new().await {
+        Ok(sman) => sman,
+        Err(e) => {
+            return Err(match e {
+                streamdeck::Error::Hid(HidError) => Error::StreamdeckError(format!(
+                    "Could not connec to the streamdeck: {}",
+                    HidError.to_string()
+                )),
+                _ => Error::StreamdeckError("Unknown Error".to_string()),
+            })
+        }
+    };
+
     let mut loaded_modules: Vec<modules::DynModule> = Vec::new();
 
     //Loading sequence

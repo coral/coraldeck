@@ -22,4 +22,7 @@ pub enum Error {
 
     #[error("Module `{0}` not found")]
     ModuleNotFound(String),
+
+    #[error("Streamdeck error: `{0}")]
+    StreamdeckError(String),
 }
