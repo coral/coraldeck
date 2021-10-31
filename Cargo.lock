@@ -76,6 +76,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
+name = "automod"
+version = "1.0.2"
+source = "git+https://github.com/ben0x539/automod.git#4623197451e130d002e71f953c7ca338f745b894"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "avahi-sys"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -395,12 +405,12 @@ name = "coraldeck"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "automod",
  "big_s",
  "blackmagic-camera-control",
  "codegen",
  "elgato-keylight",
  "font-kit",
- "for_each_mod",
  "futures",
  "image",
  "lazy_static",
@@ -831,11 +841,6 @@ dependencies = [
  "walkdir",
  "winapi",
 ]
-
-[[package]]
-name = "for_each_mod"
-version = "0.1.0"
-source = "git+https://github.com/ben0x539/for_each_mod.git#10b7eb1499b635e913cffe0be7f206a46c9b577b"
 
 [[package]]
 name = "foreign-types"

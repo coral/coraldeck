@@ -18,14 +18,17 @@ extern crate log;
 async fn main() {
     pretty_env_logger::init();
     info!("Starting CORALDECK");
+
+    let m = modules::instantiate_by_name("motu").await.unwrap();
+
     let cfg = Config::load_config("files/config.json").unwrap();
 
     let mut sman = StreamDeckManager::new().await.unwrap();
 
-    let modules = modules::instantiate_all().await.unwrap();
-    for (name, _) in &modules {
-        println!("{}", name);
-    }
+    // let modules = modules::instantiate_all().await.unwrap();
+    // for (name, _) in &modules {
+    //     println!("{}", name);
+    // }
 
     // Module init
     // let mut m: Vec<ModuleConfig> = Vec::new();
@@ -68,11 +71,11 @@ async fn main() {
 
     let mut m: Vec<ModuleConfig> = Vec::new();
 
-    let mut motu = modules::instantiate("motu").await.unwrap();
-    m.push(ModuleConfig {
-        module: motu,
-        color: graphics::Color { r: 0, g: 255, b: 1 },
-    });
+    // let mut motu = modules::instantiate("motu").await.unwrap();
+    // m.push(ModuleConfig {
+    //     module: motu,
+    //     color: graphics::Color { r: 0, g: 255, b: 1 },
+    // });
 
     // Controller
 

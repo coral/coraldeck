@@ -204,5 +204,6 @@ impl Module for MOTU {
 }
 
 pub async fn instantiate() -> Result<super::DynModule, super::Error> {
-    unimplemented!()
+    println!("THIS IS ACTUALLY IMPLEMENTED PSYCHE");
+    return Err(crate::error::Error::RenderCrash);
 }

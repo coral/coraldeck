@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::any::Any;
+use std::any::{Any, TypeId};
 use std::net::Ipv4Addr;
 use std::{collections::BTreeMap, fs};
 
@@ -17,25 +17,56 @@ fn main() {
     let data = fs::read_to_string("files/config.toml").unwrap();
     let cfg: Config = toml::from_str(&data).unwrap();
 
-    dbg!(&cfg);
+    //    let initfunc:Vec<Box<dyn Fn(cfg: Any)  = Vec::new();
 
-    for (_, m) in cfg.modules {
-        match cast_to_config(m) {
-            Ok(v) => {
-                let x: Box<dyn Any> = Box::new(v);
+    // initfunc.push(Box::new(MOTU::new());
 
-                dbg!(x);
-            }
-            Err(_) => {}
+    for (nm, m) in cfg.modules {
+        if nm == "motu" {
+            //let v: Result<MOTUConfig, toml::de::Error> = cast_to_config(m);
+            //let actual_struct = v.unwrap();
+            let am = MOTU::new(m);
+
+            dbg!(am);
         }
     }
 }
 
-#[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct MOTU {
+#[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub struct MOTUConfig {
     pub ip: Ipv4Addr,
 }
 
-fn cast_to_config(esc: toml::Value) -> Result<MOTU, toml::de::Error> {
+fn cast_to_config<T: serde::de::DeserializeOwned>(esc: toml::Value) -> Result<T, toml::de::Error> {
     esc.try_into()
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct MOTU {
+    config: MOTUConfig,
+}
+
+impl MOTU {
+    pub fn new(m: toml::Value) -> Result<MOTU, toml::de::Error> {
+        Ok(MOTU {
+            config: m.try_into()?,
+        })
+    }
+}
+
+//Other
+#[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct OtherConfig {
+    pub something: String,
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Other {
+    config: OtherConfig,
+}
+
+impl Other {
+    pub fn new(m: OtherConfig) -> Other {
+        Other { config: m }
+    }
 }
