@@ -19,7 +19,10 @@ async fn main() -> Result<(), error::Error> {
     pretty_env_logger::init();
     info!("Starting CORALDECK");
 
-    let cfg = Config::load_config("files/config.toml")?;
+    let cfg = match Config::load_config("files/config.toml") {
+        Ok(cfg) => cfg,
+        Err(e) => panic!("Could not find config: {}", e),
+    };
 
     //Streamdeck handling
     let mut sman = match StreamDeckManager::new(cfg.clone().streamdeck).await {
