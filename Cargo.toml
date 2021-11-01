@@ -27,7 +27,3 @@ big_s = "1.0.2"
 blackmagic-camera-control = "0.2.1"
 toml = "0.5.8"
 automod = { git = "https://github.com/ben0x539/automod.git"}
-
-[build-dependencies]
-codegen = "0.1.3"
-

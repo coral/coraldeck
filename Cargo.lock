@@ -408,7 +408,6 @@ dependencies = [
  "automod",
  "big_s",
  "blackmagic-camera-control",
- "codegen",
  "elgato-keylight",
  "font-kit",
  "futures",
