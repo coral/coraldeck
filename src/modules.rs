@@ -16,6 +16,8 @@ pub async fn instantiate_by_name(name: &str, config: toml::Value) -> Result<DynM
     automod::with_mods!("src/modules" PLACEHOLDER => if stringify!(PLACEHOLDER) == name {
         return PLACEHOLDER::instantiate(config).await
     });
+
+    dbg!(name);
     panic!()
 }
 

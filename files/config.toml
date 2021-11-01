@@ -7,13 +7,13 @@
     [modules.motu]
         ip = "10.0.1.5"
         color = [255, 0, 255]
-    #[modules.camera]
-    #    name = "A:4BE2529F"
-    #[modules.other]
-    #    something = "I AM TYPING SOMETHING THIS IS A STRING"
-
+    [modules.camera]
+       name = "A:4BE2529F"
+       color = [255, 80, 0]
 
 ##Defined Actions
+
+##MOTU
 [[action]]
     btn = 0
     module = "motu"
@@ -30,6 +30,42 @@
     value = "volume"
     display = "volume"
 
+
+##Camera
+[[action]]
+    btn = 2
+    module = "camera"
+    action = "iso_up"
+    desc = "ISO +"
+    value = "video_iso"
+    display = "video_iso"
+
+[[action]]
+    btn = 7
+    module = "camera"
+    action = "iso_down"
+    desc = "ISO -"
+    value = "video_iso"
+
+[[action]]
+    btn = 1
+    module = "camera"
+    action = "wb_up"
+    desc = "WB +"
+    value = "video_manual_white_balance"
+    display = "video_manual_white_balance"
+
+[[action]]
+    btn = 6
+    module = "camera"
+    action = "wb_down"
+    desc = "WB -"
+    value = "video_manual_white_balance"
+    display = "video_manual_white_balance"
+
+
+
+##Keylight
 [[action]]
     btn = 3
     module = "keylight"

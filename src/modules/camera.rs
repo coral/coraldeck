@@ -4,9 +4,9 @@ use big_s::S;
 use blackmagic_camera_control::command::{Command, Video};
 pub use blackmagic_camera_control::BluetoothCamera;
 use blackmagic_camera_control::Operation;
+use serde::Deserialize;
 
 use crate::error::Error;
-use blackmagic_camera_control::error::BluetoothCameraError;
 use lazy_static::lazy_static;
 use std::time::Duration;
 use tokio::sync::broadcast::error::RecvError;
@@ -19,28 +19,35 @@ lazy_static! {
     ];
 }
 
+#[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct CameraConfig {
+    pub name: String,
+    pub color: Vec<u8>,
+}
+
 pub struct Camera {
+    config: CameraConfig,
     cam: BluetoothCamera,
 }
 
 impl Camera {
-    pub async fn instantiate() -> Result<Camera, Error> {
-        let mut cam = BluetoothCamera::new("hello")
+    pub async fn instantiate(cfg: CameraConfig) -> Result<Camera, Error> {
+        let mut cam = BluetoothCamera::new(&cfg.name)
             .await
             .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
         cam.connect(Duration::from_secs(10))
             .await
             .map_err(|x| Error::ModuleInit("bmc".to_string(), x.to_string()))?;
 
-        Ok(Camera { cam })
+        Ok(Camera { config: cfg, cam })
     }
 
-    pub async fn new(cam: &str) -> Result<Camera, BluetoothCameraError> {
-        let mut cam = BluetoothCamera::new(cam).await?;
-        cam.connect(Duration::from_secs(10)).await?;
+    // pub async fn new(cam: &str) -> Result<Camera, BluetoothCameraError> {
+    //     let mut cam = BluetoothCamera::new(cam).await?;
+    //     cam.connect(Duration::from_secs(10)).await?;
 
-        Ok(Camera { cam })
-    }
+    //     Ok(Camera { cam })
+    // }
 }
 
 #[async_trait]
@@ -153,6 +160,8 @@ async fn wb(cam: &mut BluetoothCamera, diff: i16) -> Option<String> {
     }
 }
 
-pub async fn instantiate() -> Result<super::DynModule, Error> {
-    Ok(Box::new(Camera::instantiate().await?))
+pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Error> {
+    let config: CameraConfig = cfg.try_into()?;
+
+    Ok(Box::new(Camera::instantiate(config).await?))
 }
