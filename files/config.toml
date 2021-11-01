@@ -59,3 +59,11 @@
     action = "right_light_down"
     desc = "RIGHT -"
     value = "right_intensity"
+
+[[action]]
+    btn = 14
+    module = "keylight"
+    action = "toggle_power"
+    desc = "TOGGLE"
+    value = "power"
+    display = "power"
