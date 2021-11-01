@@ -30,3 +30,4 @@ automod = { git = "https://github.com/ben0x539/automod.git"}
 
 [build-dependencies]
 codegen = "0.1.3"
+

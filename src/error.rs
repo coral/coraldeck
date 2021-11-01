@@ -25,4 +25,7 @@ pub enum Error {
 
     #[error("Streamdeck error: `{0}")]
     StreamdeckError(String),
+
+    #[error(transparent)]
+    RequestError(#[from] reqwest::Error),
 }

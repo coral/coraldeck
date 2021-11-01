@@ -174,7 +174,7 @@ impl Controller {
         loop {
             let event = match events.recv().await {
                 Ok(event) => event,
-                Err(e) => continue,
+                Err(_) => continue,
             };
 
             let act = match self.index.get(&event.num) {

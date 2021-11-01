@@ -1,14 +1,10 @@
-//include!(concat!(env!("OUT_DIR"), "/modimports.rs"));
 pub use crate::error::Error;
-
-use std::future::Future;
-use std::pin::Pin;
 use tokio::sync::mpsc::Receiver;
 
 use async_trait::async_trait;
 
 pub type DynModule = Box<dyn Module + Send>;
-type DynModuleFuture = Pin<Box<dyn Future<Output = Result<DynModule, Error>>>>;
+//type DynModuleFuture = Pin<Box<dyn Future<Output = Result<DynModule, Error>>>>;
 
 automod::dir!("src/modules");
 
@@ -17,13 +13,7 @@ pub async fn instantiate_by_name(name: &str, config: toml::Value) -> Result<DynM
         return PLACEHOLDER::instantiate(config).await
     });
 
-    dbg!(name);
-    panic!()
-}
-
-pub struct Definiton {
-    pub name: &'static str,
-    pub instantiate: fn(cfg: toml::Value) -> DynModuleFuture,
+    return Err(Error::ModuleNotFound(name.to_string()));
 }
 
 #[async_trait]

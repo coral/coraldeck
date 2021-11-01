@@ -25,6 +25,7 @@ pub struct CameraConfig {
     pub color: Vec<u8>,
 }
 
+#[allow(dead_code)]
 pub struct Camera {
     config: CameraConfig,
     cam: BluetoothCamera,

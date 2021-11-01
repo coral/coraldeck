@@ -1,7 +1,7 @@
+use crate::error::Error;
 use crate::modules::Module;
 use async_trait::async_trait;
 use big_s::S;
-use log::error;
 use rand::Rng;
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -11,16 +11,9 @@ use std::net::Ipv4Addr;
 use std::ops::DerefMut;
 use std::sync::Arc;
 use std::time::Duration;
-use thiserror::Error;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
 use tokio::time;
-
-#[derive(Error, Debug)]
-pub enum MOTUError {
-    #[error(transparent)]
-    RequestError(#[from] reqwest::Error),
-}
 
 #[derive(Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MOTUConfig {
@@ -42,7 +35,7 @@ pub struct MOTU {
 }
 
 impl MOTU {
-    pub async fn new(cfg: MOTUConfig) -> MOTU {
+    pub async fn new(cfg: MOTUConfig) -> Result<MOTU, Error> {
         let mut rng = rand::thread_rng();
         let client_id = rng.gen::<u32>();
 
@@ -61,12 +54,12 @@ impl MOTU {
             rendtrig: None,
         };
 
-        m.connect().await;
+        m.connect().await?;
 
-        m
+        Ok(m)
     }
 
-    pub async fn connect(&mut self) -> Result<(), MOTUError> {
+    pub async fn connect(&mut self) -> Result<(), Error> {
         let data = MOTU::get_cache(self.client.clone(), self.url.clone()).await?;
 
         *self.cache.clone().lock().await.deref_mut() = data;
@@ -95,7 +88,7 @@ impl MOTU {
     async fn get_cache(
         client: reqwest::Client,
         url: String,
-    ) -> Result<HashMap<String, Value>, MOTUError> {
+    ) -> Result<HashMap<String, Value>, Error> {
         let resp = client.get(&url).send().await?;
 
         Ok(resp.json::<HashMap<String, Value>>().await?)
@@ -112,7 +105,7 @@ impl MOTU {
         &mut self,
         key: &str,
         value: T,
-    ) -> Result<reqwest::Response, MOTUError> {
+    ) -> Result<reqwest::Response, Error> {
         let url = self.url.clone();
 
         let form =
@@ -221,5 +214,5 @@ impl Module for MOTU {
 pub async fn instantiate(cfg: toml::Value) -> Result<super::DynModule, super::Error> {
     let config: MOTUConfig = cfg.try_into()?;
 
-    Ok(Box::new(MOTU::new(config).await))
+    Ok(Box::new(MOTU::new(config).await?))
 }

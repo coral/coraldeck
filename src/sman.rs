@@ -82,6 +82,7 @@ impl StreamDeckManager {
         self.device.lock().await.reset()
     }
 
+    #[allow(dead_code)]
     pub async fn brightness(&mut self, brightness: u8) -> Result<(), streamdeck::Error> {
         self.device.lock().await.set_brightness(brightness)
     }

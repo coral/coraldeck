@@ -8,7 +8,6 @@ pub struct BigLetter {
     bg: SolidSource,
 
     header_text: SolidSource,
-    text: SolidSource,
 
     letter: String,
 }
@@ -27,13 +26,6 @@ impl Default for BigLetter {
                 r: 160,
                 g: 160,
                 b: 160,
-                a: 0xff,
-            },
-
-            text: SolidSource {
-                r: 180,
-                g: 180,
-                b: 180,
                 a: 0xff,
             },
 
