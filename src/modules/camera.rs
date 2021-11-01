@@ -42,13 +42,6 @@ impl Camera {
 
         Ok(Camera { config: cfg, cam })
     }
-
-    // pub async fn new(cam: &str) -> Result<Camera, BluetoothCameraError> {
-    //     let mut cam = BluetoothCamera::new(cam).await?;
-    //     cam.connect(Duration::from_secs(10)).await?;
-
-    //     Ok(Camera { cam })
-    // }
 }
 
 #[async_trait]
