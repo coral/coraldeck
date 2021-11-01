@@ -1,0 +1,10 @@
+[Unit]
+Description=Coraldeck
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/home/pi/rust/coraldeck/package
+ExecStart=/home/pi/rust/coraldeck/package/coraldeck
+
+[Install]
+WantedBy=multi-user.target
